@@ -2,31 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---- Light theme: warm neutral (sand / cream / taupe) with green accent ---- */
+/* ---- Light theme: crisp cool neutrals (GitHub-style) with green accent ---- */
 :root {
-  --app: #ebe6dd; /* page background — warm sand, low glare */
-  --surface: #f6f2ea; /* cards / panels — warm cream */
-  --subtle: #e2dace; /* table headers, hovers, secondary fills — soft taupe */
-  --line: #d3c9ba; /* borders — warm tan */
-  --ink: #2e2a23; /* primary text — dark warm brown, not pure black */
-  --muted: #6c6356; /* secondary text — warm gray-brown */
-  --faint: #9b9284; /* tertiary text — muted taupe */
-  --brand: 76 110 73; /* natural muted green (rgb channels) */
-  --brand-dark: 60 90 58;
+  --app: #f6f8fa; /* page background — light cool gray */
+  --surface: #ffffff; /* cards / panels — clean white */
+  --subtle: #eaeef2; /* table headers, hovers, secondary fills */
+  --line: #d1d9e0; /* borders — crisp */
+  --ink: #1f2328; /* primary text — high-contrast near-black */
+  --muted: #59636e; /* secondary text */
+  --faint: #818b98; /* tertiary text */
+  --brand: 31 136 61; /* GitHub primary green (rgb channels) */
+  --brand-dark: 26 127 55;
   color-scheme: light;
 }
 
-/* ---- Dark theme: warm near-black (deep brown-gray) with green accent ---- */
+/* ---- Dark theme: GitHub dark neutrals with green accent ---- */
 .dark {
-  --app: #16130f; /* deep warm near-black */
-  --surface: #211d17; /* cards / panels — dark brown */
-  --subtle: #2a251e; /* table headers, hovers */
-  --line: #3a342b; /* borders — warm */
-  --ink: #e8e1d4; /* primary text — warm off-white, easy on eyes */
-  --muted: #a89e8e;
-  --faint: #766c5d;
-  --brand: 130 176 122; /* lighter green for contrast on dark */
-  --brand-dark: 112 158 104;
+  --app: #0d1117; /* canvas */
+  --surface: #161b22; /* cards / panels */
+  --subtle: #21262d; /* table headers, hovers */
+  --line: #30363d; /* borders */
+  --ink: #e6edf3; /* primary text — crisp off-white */
+  --muted: #9198a1;
+  --faint: #6e7681;
+  --brand: 46 160 67; /* green accent for dark */
+  --brand-dark: 35 134 54;
   color-scheme: dark;
 }
 
