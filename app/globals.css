@@ -2,15 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---- Light theme: soft, low-glare palette ---- */
 :root {
+  --app: #e9ebf1; /* page background — muted cool gray, not bright white */
+  --surface: #f7f8fb; /* cards / panels — soft off-white */
+  --subtle: #e2e5ec; /* table headers, hovers, secondary fills */
+  --line: #d4d8e1; /* borders */
+  --ink: #2c3140; /* primary text — soft slate, not pure black */
+  --muted: #5e6675; /* secondary text */
+  --faint: #939bab; /* tertiary text */
+  --brand: 91 100 196; /* muted indigo (rgb channels) */
+  --brand-dark: 74 82 176;
   color-scheme: light;
 }
 
-body {
-  @apply bg-gray-50 text-gray-900;
+/* ---- Dark theme: deep, gentle palette ---- */
+.dark {
+  --app: #0f1218; /* deep slate, not pure black */
+  --surface: #181c24; /* cards / panels */
+  --subtle: #1f242e; /* table headers, hovers */
+  --line: #2b313d; /* borders */
+  --ink: #dce0e8; /* primary text — soft off-white, easy on eyes */
+  --muted: #99a1b1;
+  --faint: #69727f;
+  --brand: 132 140 236; /* lighter indigo for contrast on dark */
+  --brand-dark: 112 121 224;
+  color-scheme: dark;
 }
 
-/* Small reusable component classes */
+@layer base {
+  /* Make bare border utilities (border-b, etc.) use the theme line color. */
+  *,
+  ::before,
+  ::after {
+    border-color: var(--line);
+  }
+  body {
+    @apply bg-app text-ink;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+/* Reusable component classes (theme-aware) */
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50;
@@ -19,18 +52,18 @@ body {
     @apply btn bg-brand text-white hover:bg-brand-dark;
   }
   .btn-secondary {
-    @apply btn border border-gray-300 bg-white text-gray-700 hover:bg-gray-100;
+    @apply btn border border-line bg-surface text-ink hover:bg-subtle;
   }
   .btn-danger {
     @apply btn bg-red-600 text-white hover:bg-red-700;
   }
   .input {
-    @apply w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand;
+    @apply w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand;
   }
   .label {
-    @apply mb-1 block text-sm font-medium text-gray-700;
+    @apply mb-1 block text-sm font-medium text-ink;
   }
   .card {
-    @apply rounded-lg border border-gray-200 bg-white p-5 shadow-sm;
+    @apply rounded-lg border border-line bg-surface p-5 shadow-sm;
   }
 }

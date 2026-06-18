@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import NavLink from "@/components/NavLink";
 import SignOutButton from "@/components/SignOutButton";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default async function AppLayout({
   children,
@@ -12,7 +13,7 @@ export default async function AppLayout({
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-gray-200 bg-white">
+      <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-6">
             <Link href="/" className="text-lg font-bold text-brand">
@@ -27,9 +28,10 @@ export default async function AppLayout({
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
+            <ThemeToggle />
+            <span className="text-sm text-muted">
               {user.name}
-              <span className="ml-1 rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500">
+              <span className="ml-1 rounded bg-subtle px-1.5 py-0.5 text-xs text-muted">
                 {user.role}
               </span>
             </span>

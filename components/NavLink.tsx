@@ -20,7 +20,7 @@ export default function NavLink({
       className={
         active
           ? "rounded-md bg-brand/10 px-3 py-2 text-sm font-medium text-brand"
-          : "rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+          : "rounded-md px-3 py-2 text-sm font-medium text-muted hover:bg-subtle"
       }
     >
       {label}

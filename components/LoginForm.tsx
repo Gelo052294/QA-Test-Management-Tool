@@ -62,7 +62,7 @@ export default function LoginForm() {
           {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
-      <p className="mt-4 text-center text-sm text-gray-600">
+      <p className="mt-4 text-center text-sm text-muted">
         No account?{" "}
         <Link href="/register" className="text-brand hover:underline">
           Register

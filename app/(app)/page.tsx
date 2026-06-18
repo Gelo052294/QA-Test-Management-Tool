@@ -35,7 +35,7 @@ export default async function DashboardPage() {
         {cards.map((c) => (
           <Link key={c.label} href={c.href} className="card hover:shadow-md">
             <div className="text-3xl font-bold text-brand">{c.value}</div>
-            <div className="mt-1 text-sm text-gray-500">{c.label}</div>
+            <div className="mt-1 text-sm text-muted">{c.label}</div>
           </Link>
         ))}
       </div>
@@ -48,15 +48,15 @@ export default async function DashboardPage() {
           </Link>
         </div>
         {recent.length === 0 ? (
-          <p className="text-sm text-gray-500">No executions recorded yet.</p>
+          <p className="text-sm text-muted">No executions recorded yet.</p>
         ) : (
-          <ul className="divide-y divide-gray-100 text-sm">
+          <ul className="divide-y divide-line text-sm">
             {recent.map((e) => (
               <li key={e.id} className="flex items-center justify-between py-2">
                 <div>
-                  <span className="font-mono text-xs text-gray-400">{e.testCase.key}</span>{" "}
+                  <span className="font-mono text-xs text-faint">{e.testCase.key}</span>{" "}
                   {e.testCase.title}
-                  <span className="text-gray-400">
+                  <span className="text-faint">
                     {" "}
                     in{" "}
                     <Link href={`/cycles/${e.cycle.id}`} className="hover:underline">
@@ -65,7 +65,7 @@ export default async function DashboardPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-faint">
                     {e.executedBy?.name} ·{" "}
                     {e.executedAt ? new Date(e.executedAt).toLocaleDateString() : ""}
                   </span>

@@ -73,10 +73,10 @@ export default function AddTestCases({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-      <div className="flex max-h-[80vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-xl">
+      <div className="flex max-h-[80vh] w-full max-w-2xl flex-col rounded-lg bg-surface shadow-xl">
         <div className="flex items-center justify-between border-b p-4">
           <h3 className="font-semibold">Add test cases to cycle</h3>
-          <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-700">
+          <button onClick={() => setOpen(false)} className="text-faint hover:text-ink">
             ✕
           </button>
         </div>
@@ -90,23 +90,23 @@ export default function AddTestCases({
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
-            <p className="text-sm text-gray-500">Loading...</p>
+            <p className="text-sm text-muted">Loading...</p>
           ) : available.length === 0 ? (
-            <p className="text-sm text-gray-500">No more test cases to add.</p>
+            <p className="text-sm text-muted">No more test cases to add.</p>
           ) : (
             <ul className="space-y-1">
               {available.map((tc) => (
                 <li key={tc.id}>
-                  <label className="flex cursor-pointer items-center gap-2 rounded p-1.5 hover:bg-gray-50">
+                  <label className="flex cursor-pointer items-center gap-2 rounded p-1.5 hover:bg-subtle">
                     <input
                       type="checkbox"
                       checked={selected.has(tc.id)}
                       onChange={() => toggle(tc.id)}
                     />
-                    <span className="font-mono text-xs text-gray-400">{tc.key}</span>
+                    <span className="font-mono text-xs text-faint">{tc.key}</span>
                     <span className="text-sm">{tc.title}</span>
                     {tc.folder && (
-                      <span className="ml-auto text-xs text-gray-400">{tc.folder}</span>
+                      <span className="ml-auto text-xs text-faint">{tc.folder}</span>
                     )}
                   </label>
                 </li>
@@ -115,7 +115,7 @@ export default function AddTestCases({
           )}
         </div>
         <div className="flex items-center justify-end gap-3 border-t p-4">
-          <span className="mr-auto text-sm text-gray-500">{selected.size} selected</span>
+          <span className="mr-auto text-sm text-muted">{selected.size} selected</span>
           <button className="btn-secondary" onClick={() => setOpen(false)}>
             Cancel
           </button>

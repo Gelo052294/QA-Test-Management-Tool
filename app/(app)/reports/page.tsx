@@ -19,19 +19,19 @@ export default async function ReportsPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Link href={`/reports/monthly?month=${month}`} className="card hover:shadow-md">
           <h2 className="font-semibold">📅 Monthly execution</h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted">
             Tests executed this month, by whom, with pass rate.
           </p>
         </Link>
         <Link href="/reports/testers" className="card hover:shadow-md">
           <h2 className="font-semibold">👤 Per-tester activity</h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted">
             Test cases created and executions run per user.
           </p>
         </Link>
         <Link href="/reports/jira-coverage" className="card hover:shadow-md">
           <h2 className="font-semibold">🔗 Jira coverage</h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted">
             Which Jira tickets have linked test cases and their latest result.
           </p>
         </Link>
@@ -40,9 +40,9 @@ export default async function ReportsPage() {
       <div className="card mt-6">
         <h2 className="mb-3 font-semibold">📊 Test cycle summary</h2>
         {cycles.length === 0 ? (
-          <p className="text-sm text-gray-500">No cycles yet.</p>
+          <p className="text-sm text-muted">No cycles yet.</p>
         ) : (
-          <ul className="divide-y divide-gray-100">
+          <ul className="divide-y divide-line">
             {cycles.map((c) => (
               <li key={c.id} className="flex items-center justify-between py-2">
                 <span>{c.name}</span>

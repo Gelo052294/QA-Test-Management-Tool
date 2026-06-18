@@ -1,7 +1,7 @@
 const base = process.env.NEXT_PUBLIC_JIRA_BASE_URL;
 
 export default function JiraLink({ jiraKey }: { jiraKey?: string | null }) {
-  if (!jiraKey) return <span className="text-gray-400">—</span>;
+  if (!jiraKey) return <span className="text-faint">—</span>;
   if (!base) {
     return <span className="font-mono text-sm">{jiraKey}</span>;
   }

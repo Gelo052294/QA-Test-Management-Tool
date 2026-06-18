@@ -1,21 +1,21 @@
 const priorityColors: Record<string, string> = {
-  low: "bg-gray-100 text-gray-700",
-  medium: "bg-blue-100 text-blue-700",
-  high: "bg-orange-100 text-orange-700",
-  critical: "bg-red-100 text-red-700",
+  low: "bg-subtle text-muted",
+  medium: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
+  high: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300",
+  critical: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
 };
 
 const tcStatusColors: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-700",
-  active: "bg-green-100 text-green-700",
-  deprecated: "bg-gray-200 text-gray-500",
+  draft: "bg-subtle text-muted",
+  active: "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300",
+  deprecated: "bg-subtle text-faint",
 };
 
 export const execStatusColors: Record<string, string> = {
-  not_run: "bg-gray-100 text-gray-600",
-  pass: "bg-green-100 text-green-700",
-  fail: "bg-red-100 text-red-700",
-  blocked: "bg-yellow-100 text-yellow-700",
+  not_run: "bg-subtle text-muted",
+  pass: "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300",
+  fail: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
+  blocked: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-300",
 };
 
 function Pill({ text, className }: { text: string; className: string }) {
@@ -27,18 +27,18 @@ function Pill({ text, className }: { text: string; className: string }) {
 }
 
 export function PriorityBadge({ value }: { value: string }) {
-  return <Pill text={value} className={priorityColors[value] ?? "bg-gray-100"} />;
+  return <Pill text={value} className={priorityColors[value] ?? "bg-subtle"} />;
 }
 
 export function TestCaseStatusBadge({ value }: { value: string }) {
-  return <Pill text={value} className={tcStatusColors[value] ?? "bg-gray-100"} />;
+  return <Pill text={value} className={tcStatusColors[value] ?? "bg-subtle"} />;
 }
 
 export function ExecutionStatusBadge({ value }: { value: string }) {
   return (
     <Pill
       text={value.replace("_", " ")}
-      className={execStatusColors[value] ?? "bg-gray-100"}
+      className={execStatusColors[value] ?? "bg-subtle"}
     />
   );
 }

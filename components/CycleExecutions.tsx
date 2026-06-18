@@ -26,7 +26,7 @@ export default function CycleExecutions({
 }) {
   if (executions.length === 0) {
     return (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-muted">
         No test cases in this cycle yet. Use “Add test cases” above.
       </p>
     );
@@ -100,14 +100,14 @@ function Row({ ex }: { ex: ExecRow }) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 p-4">
+    <div className="rounded-lg border border-line p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
           <Link
             href={`/test-cases/${ex.testCase.id}`}
             className="font-medium hover:underline"
           >
-            <span className="font-mono text-xs text-gray-400">
+            <span className="font-mono text-xs text-faint">
               {ex.testCase.key}
             </span>{" "}
             {ex.testCase.title}
@@ -116,7 +116,7 @@ function Row({ ex }: { ex: ExecRow }) {
         <div className="flex items-center gap-2">
           <ExecutionStatusBadge value={status} />
           {ex.executedByName && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-faint">
               by {ex.executedByName}
               {ex.executedAt
                 ? ` · ${new Date(ex.executedAt).toLocaleString()}`
@@ -175,7 +175,7 @@ function Row({ ex }: { ex: ExecRow }) {
             disabled={uploading}
           />
         </label>
-        {msg && <span className="text-xs text-gray-500">{msg}</span>}
+        {msg && <span className="text-xs text-muted">{msg}</span>}
       </div>
 
       {ex.evidence.length > 0 && (

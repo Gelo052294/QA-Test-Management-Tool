@@ -45,7 +45,7 @@ export default async function TestCasesPage({
 
       <div className="card overflow-x-auto p-0">
         <table className="w-full text-sm">
-          <thead className="border-b border-gray-200 bg-gray-50 text-left text-xs uppercase text-gray-500">
+          <thead className="border-b border-line bg-subtle text-left text-xs uppercase text-muted">
             <tr>
               <th className="px-4 py-3">Key</th>
               <th className="px-4 py-3">Title</th>
@@ -56,9 +56,9 @@ export default async function TestCasesPage({
               <th className="px-4 py-3">Created by</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-line">
             {testCases.map((tc) => (
-              <tr key={tc.id} className="hover:bg-gray-50">
+              <tr key={tc.id} className="hover:bg-subtle">
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
                   <Link href={`/test-cases/${tc.id}`} className="text-brand hover:underline">
                     {tc.key}
@@ -75,16 +75,16 @@ export default async function TestCasesPage({
                 <td className="px-4 py-3">
                   <TestCaseStatusBadge value={tc.status} />
                 </td>
-                <td className="px-4 py-3 text-gray-600">{tc.folder || "—"}</td>
+                <td className="px-4 py-3 text-muted">{tc.folder || "—"}</td>
                 <td className="px-4 py-3">
                   <JiraLink jiraKey={tc.jiraKey} />
                 </td>
-                <td className="px-4 py-3 text-gray-600">{tc.createdBy.name}</td>
+                <td className="px-4 py-3 text-muted">{tc.createdBy.name}</td>
               </tr>
             ))}
             {testCases.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-gray-500">
+                <td colSpan={7} className="px-4 py-10 text-center text-muted">
                   No test cases yet.{" "}
                   <Link href="/test-cases/new" className="text-brand hover:underline">
                     Create the first one

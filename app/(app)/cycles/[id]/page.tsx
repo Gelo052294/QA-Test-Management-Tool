@@ -60,19 +60,19 @@ export default async function CycleDetailPage({
     { label: "Passed", value: passed, color: "text-green-600" },
     { label: "Failed", value: failed, color: "text-red-600" },
     { label: "Blocked", value: blocked, color: "text-yellow-600" },
-    { label: "Not run", value: notRun, color: "text-gray-500" },
+    { label: "Not run", value: notRun, color: "text-muted" },
   ];
 
   return (
     <div>
       <div className="mb-5 flex items-start justify-between">
         <div>
-          <Link href="/cycles" className="text-sm text-gray-500 hover:underline">
+          <Link href="/cycles" className="text-sm text-muted hover:underline">
             ← Back to cycles
           </Link>
           <h1 className="mt-1 text-xl font-bold">{cycle.name}</h1>
           {cycle.description && (
-            <p className="mt-1 text-sm text-gray-500">{cycle.description}</p>
+            <p className="mt-1 text-sm text-muted">{cycle.description}</p>
           )}
         </div>
         <div className="flex gap-2">
@@ -94,16 +94,16 @@ export default async function CycleDetailPage({
         {stats.map((s) => (
           <div key={s.label} className="card text-center">
             <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
-            <div className="text-xs text-gray-500">{s.label}</div>
+            <div className="text-xs text-muted">{s.label}</div>
           </div>
         ))}
         <div className="card text-center">
           <div className="text-2xl font-bold text-brand">{passRate}%</div>
-          <div className="text-xs text-gray-500">Pass rate</div>
+          <div className="text-xs text-muted">Pass rate</div>
         </div>
         <div className="card text-center">
-          <div className="text-2xl font-bold text-gray-800">{progress}%</div>
-          <div className="text-xs text-gray-500">Executed</div>
+          <div className="text-2xl font-bold text-ink">{progress}%</div>
+          <div className="text-xs text-muted">Executed</div>
         </div>
       </div>
 

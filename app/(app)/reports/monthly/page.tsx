@@ -23,7 +23,7 @@ export default async function MonthlyReportPage({
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link href="/reports" className="text-sm text-gray-500 hover:underline">
+          <Link href="/reports" className="text-sm text-muted hover:underline">
             ← Reports
           </Link>
           <h1 className="mt-1 text-xl font-bold">Monthly execution report</h1>
@@ -38,34 +38,34 @@ export default async function MonthlyReportPage({
 
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <div className="card text-center">
-          <div className="text-2xl font-bold text-gray-800">{report.totalExecuted}</div>
-          <div className="text-xs text-gray-500">Executed</div>
+          <div className="text-2xl font-bold text-ink">{report.totalExecuted}</div>
+          <div className="text-xs text-muted">Executed</div>
         </div>
         <div className="card text-center">
           <div className="text-2xl font-bold text-green-600">{report.counts.pass}</div>
-          <div className="text-xs text-gray-500">Passed</div>
+          <div className="text-xs text-muted">Passed</div>
         </div>
         <div className="card text-center">
           <div className="text-2xl font-bold text-red-600">{report.counts.fail}</div>
-          <div className="text-xs text-gray-500">Failed</div>
+          <div className="text-xs text-muted">Failed</div>
         </div>
         <div className="card text-center">
           <div className="text-2xl font-bold text-yellow-600">{report.counts.blocked}</div>
-          <div className="text-xs text-gray-500">Blocked</div>
+          <div className="text-xs text-muted">Blocked</div>
         </div>
         <div className="card text-center">
           <div className="text-2xl font-bold text-brand">{report.passRate}%</div>
-          <div className="text-xs text-gray-500">Pass rate</div>
+          <div className="text-xs text-muted">Pass rate</div>
         </div>
       </div>
 
       <div className="card mb-6">
         <h2 className="mb-3 font-semibold">By tester</h2>
         {report.byTester.length === 0 ? (
-          <p className="text-sm text-gray-500">No executions this month.</p>
+          <p className="text-sm text-muted">No executions this month.</p>
         ) : (
           <table className="w-full text-sm">
-            <thead className="text-left text-xs uppercase text-gray-500">
+            <thead className="text-left text-xs uppercase text-muted">
               <tr>
                 <th className="py-2">Tester</th>
                 <th className="py-2">Passed</th>
@@ -74,7 +74,7 @@ export default async function MonthlyReportPage({
                 <th className="py-2">Pass rate</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-line">
               {report.byTester.map((t) => (
                 <tr key={t.name}>
                   <td className="py-2">{t.name}</td>
@@ -91,7 +91,7 @@ export default async function MonthlyReportPage({
 
       <div className="card overflow-x-auto p-0">
         <table className="w-full text-sm">
-          <thead className="border-b bg-gray-50 text-left text-xs uppercase text-gray-500">
+          <thead className="border-b bg-subtle text-left text-xs uppercase text-muted">
             <tr>
               <th className="px-4 py-3">Executed at</th>
               <th className="px-4 py-3">Test Case</th>
@@ -100,25 +100,25 @@ export default async function MonthlyReportPage({
               <th className="px-4 py-3">Executed by</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-line">
             {report.rows.map((r, i) => (
               <tr key={i}>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-4 py-3 text-muted">
                   {r.executedAt ? new Date(r.executedAt).toLocaleString() : "—"}
                 </td>
                 <td className="px-4 py-3">
-                  <span className="font-mono text-xs text-gray-400">{r.key}</span> {r.title}
+                  <span className="font-mono text-xs text-faint">{r.key}</span> {r.title}
                 </td>
-                <td className="px-4 py-3 text-gray-600">{r.cycle}</td>
+                <td className="px-4 py-3 text-muted">{r.cycle}</td>
                 <td className="px-4 py-3">
                   <ExecutionStatusBadge value={r.status} />
                 </td>
-                <td className="px-4 py-3 text-gray-600">{r.executedBy}</td>
+                <td className="px-4 py-3 text-muted">{r.executedBy}</td>
               </tr>
             ))}
             {report.rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={5} className="px-4 py-8 text-center text-muted">
                   No executions recorded in {month}.
                 </td>
               </tr>

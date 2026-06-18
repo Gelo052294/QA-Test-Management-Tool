@@ -5,7 +5,7 @@ export default function NewTestCasePage() {
   return (
     <div>
       <div className="mb-5">
-        <Link href="/test-cases" className="text-sm text-gray-500 hover:underline">
+        <Link href="/test-cases" className="text-sm text-muted hover:underline">
           ← Back to test cases
         </Link>
         <h1 className="mt-1 text-xl font-bold">New Test Case</h1>

@@ -12,7 +12,7 @@ export default async function JiraCoverageReportPage() {
     <div>
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <Link href="/reports" className="text-sm text-gray-500 hover:underline">
+          <Link href="/reports" className="text-sm text-muted hover:underline">
             ← Reports
           </Link>
           <h1 className="mt-1 text-xl font-bold">Jira coverage</h1>
@@ -23,7 +23,7 @@ export default async function JiraCoverageReportPage() {
       </div>
 
       {coverage.length === 0 ? (
-        <p className="text-gray-500">No test cases are linked to Jira tickets yet.</p>
+        <p className="text-muted">No test cases are linked to Jira tickets yet.</p>
       ) : (
         <div className="space-y-4">
           {coverage.map((g) => (
@@ -32,15 +32,15 @@ export default async function JiraCoverageReportPage() {
                 <h2 className="font-semibold">
                   <JiraLink jiraKey={g.jiraKey} />
                 </h2>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted">
                   {g.linkedCount} linked test case{g.linkedCount === 1 ? "" : "s"}
                 </span>
               </div>
-              <ul className="divide-y divide-gray-100 text-sm">
+              <ul className="divide-y divide-line text-sm">
                 {g.testCases.map((tc) => (
                   <li key={tc.key} className="flex items-center justify-between py-2">
                     <span>
-                      <span className="font-mono text-xs text-gray-400">{tc.key}</span> {tc.title}
+                      <span className="font-mono text-xs text-faint">{tc.key}</span> {tc.title}
                     </span>
                     <ExecutionStatusBadge value={tc.latestStatus} />
                   </li>

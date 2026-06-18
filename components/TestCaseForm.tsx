@@ -183,7 +183,7 @@ export default function TestCaseForm({
         <div className="space-y-2">
           {values.steps.map((s, i) => (
             <div key={i} className="grid grid-cols-1 gap-2 sm:grid-cols-[2rem,1fr,1fr,2rem] sm:items-start">
-              <div className="pt-2 text-sm text-gray-500">{i + 1}.</div>
+              <div className="pt-2 text-sm text-muted">{i + 1}.</div>
               <textarea
                 className="input"
                 rows={2}

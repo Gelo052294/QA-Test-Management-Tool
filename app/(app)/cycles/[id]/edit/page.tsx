@@ -31,7 +31,7 @@ export default async function EditCyclePage({
   return (
     <div>
       <div className="mb-5">
-        <Link href={`/cycles/${cycle.id}`} className="text-sm text-gray-500 hover:underline">
+        <Link href={`/cycles/${cycle.id}`} className="text-sm text-muted hover:underline">
           ← Back to cycle
         </Link>
         <h1 className="mt-1 text-xl font-bold">Edit cycle</h1>

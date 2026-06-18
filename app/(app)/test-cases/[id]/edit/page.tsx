@@ -34,11 +34,11 @@ export default async function EditTestCasePage({
   return (
     <div>
       <div className="mb-5">
-        <Link href={`/test-cases/${tc.id}`} className="text-sm text-gray-500 hover:underline">
+        <Link href={`/test-cases/${tc.id}`} className="text-sm text-muted hover:underline">
           ← Back to test case
         </Link>
         <h1 className="mt-1 text-xl font-bold">
-          Edit <span className="font-mono text-gray-400">{tc.key}</span>
+          Edit <span className="font-mono text-faint">{tc.key}</span>
         </h1>
       </div>
       <div className="card">
