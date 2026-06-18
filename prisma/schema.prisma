@@ -1,0 +1,125 @@
+// Prisma schema for the QA Test Management Tool.
+// Storage: Postgres (Vercel Postgres / Neon).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  tester
+}
+
+enum TestCasePriority {
+  low
+  medium
+  high
+  critical
+}
+
+enum TestCaseStatus {
+  draft
+  active
+  deprecated
+}
+
+enum CycleStatus {
+  active
+  completed
+}
+
+enum ExecutionStatus {
+  not_run
+  pass
+  fail
+  blocked
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(tester)
+  apiToken     String?  @unique // Bearer token for programmatic API access
+  createdAt    DateTime @default(now())
+
+  createdTestCases  TestCase[]      @relation("TestCaseCreatedBy")
+  createdCycles     TestCycle[]     @relation("CycleCreatedBy")
+  executions        TestExecution[] @relation("ExecutionExecutedBy")
+  uploadedEvidence  Evidence[]      @relation("EvidenceUploadedBy")
+}
+
+model TestCase {
+  id            String           @id @default(cuid())
+  key           String           @unique // human-friendly, e.g. TC-1
+  seq           Int              @unique @default(autoincrement()) // backs the key number
+  title         String
+  description   String?
+  preconditions String?
+  steps         Json             @default("[]") // [{ step, expectedResult }]
+  priority      TestCasePriority @default(medium)
+  status        TestCaseStatus   @default(active)
+  folder        String?
+  jiraKey       String? // e.g. PROJ-123 (link-only)
+  createdById   String
+  createdBy     User             @relation("TestCaseCreatedBy", fields: [createdById], references: [id])
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  executions TestExecution[]
+
+  @@index([jiraKey])
+  @@index([folder])
+}
+
+model TestCycle {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  status      CycleStatus @default(active)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdById String
+  createdBy   User        @relation("CycleCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime    @default(now())
+
+  executions TestExecution[]
+}
+
+model TestExecution {
+  id            String          @id @default(cuid())
+  cycleId       String
+  cycle         TestCycle       @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  testCaseId    String
+  testCase      TestCase        @relation(fields: [testCaseId], references: [id], onDelete: Cascade)
+  status        ExecutionStatus @default(not_run)
+  comment       String?
+  defectJiraKey String?
+  executedById  String?
+  executedBy    User?           @relation("ExecutionExecutedBy", fields: [executedById], references: [id])
+  executedAt    DateTime?
+  createdAt     DateTime        @default(now())
+
+  evidence Evidence[]
+
+  @@unique([cycleId, testCaseId])
+  @@index([executedAt])
+}
+
+model Evidence {
+  id           String        @id @default(cuid())
+  executionId  String
+  execution    TestExecution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  fileName     String
+  url          String
+  contentType  String?
+  uploadedById String
+  uploadedBy   User          @relation("EvidenceUploadedBy", fields: [uploadedById], references: [id])
+  uploadedAt   DateTime      @default(now())
+}

@@ -1,0 +1,131 @@
+import Link from "next/link";
+import { monthlyReport } from "@/lib/reports";
+import { ExecutionStatusBadge } from "@/components/Badges";
+import MonthPicker from "@/components/MonthPicker";
+
+export const dynamic = "force-dynamic";
+
+export default async function MonthlyReportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string }>;
+}) {
+  const { month: monthParam } = await searchParams;
+  const now = new Date();
+  const month =
+    monthParam && /^\d{4}-\d{2}$/.test(monthParam)
+      ? monthParam
+      : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  const report = await monthlyReport(month);
+
+  return (
+    <div>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <Link href="/reports" className="text-sm text-gray-500 hover:underline">
+            ← Reports
+          </Link>
+          <h1 className="mt-1 text-xl font-bold">Monthly execution report</h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <MonthPicker month={month} />
+          <a href={`/api/reports/monthly?month=${month}&format=csv`} className="btn-secondary">
+            Export CSV
+          </a>
+        </div>
+      </div>
+
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-gray-800">{report.totalExecuted}</div>
+          <div className="text-xs text-gray-500">Executed</div>
+        </div>
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-green-600">{report.counts.pass}</div>
+          <div className="text-xs text-gray-500">Passed</div>
+        </div>
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-red-600">{report.counts.fail}</div>
+          <div className="text-xs text-gray-500">Failed</div>
+        </div>
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-yellow-600">{report.counts.blocked}</div>
+          <div className="text-xs text-gray-500">Blocked</div>
+        </div>
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-brand">{report.passRate}%</div>
+          <div className="text-xs text-gray-500">Pass rate</div>
+        </div>
+      </div>
+
+      <div className="card mb-6">
+        <h2 className="mb-3 font-semibold">By tester</h2>
+        {report.byTester.length === 0 ? (
+          <p className="text-sm text-gray-500">No executions this month.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="text-left text-xs uppercase text-gray-500">
+              <tr>
+                <th className="py-2">Tester</th>
+                <th className="py-2">Passed</th>
+                <th className="py-2">Failed</th>
+                <th className="py-2">Blocked</th>
+                <th className="py-2">Pass rate</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {report.byTester.map((t) => (
+                <tr key={t.name}>
+                  <td className="py-2">{t.name}</td>
+                  <td className="py-2">{t.pass}</td>
+                  <td className="py-2">{t.fail}</td>
+                  <td className="py-2">{t.blocked}</td>
+                  <td className="py-2">{t.passRate}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <div className="card overflow-x-auto p-0">
+        <table className="w-full text-sm">
+          <thead className="border-b bg-gray-50 text-left text-xs uppercase text-gray-500">
+            <tr>
+              <th className="px-4 py-3">Executed at</th>
+              <th className="px-4 py-3">Test Case</th>
+              <th className="px-4 py-3">Cycle</th>
+              <th className="px-4 py-3">Result</th>
+              <th className="px-4 py-3">Executed by</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {report.rows.map((r, i) => (
+              <tr key={i}>
+                <td className="px-4 py-3 text-gray-600">
+                  {r.executedAt ? new Date(r.executedAt).toLocaleString() : "—"}
+                </td>
+                <td className="px-4 py-3">
+                  <span className="font-mono text-xs text-gray-400">{r.key}</span> {r.title}
+                </td>
+                <td className="px-4 py-3 text-gray-600">{r.cycle}</td>
+                <td className="px-4 py-3">
+                  <ExecutionStatusBadge value={r.status} />
+                </td>
+                <td className="px-4 py-3 text-gray-600">{r.executedBy}</td>
+              </tr>
+            ))}
+            {report.rows.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                  No executions recorded in {month}.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
