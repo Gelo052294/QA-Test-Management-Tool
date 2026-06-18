@@ -43,7 +43,7 @@ export default async function TestersReportPage() {
                 <td className="px-4 py-3">{t.executionsRun}</td>
                 <td className="px-4 py-3 text-green-600">{t.pass}</td>
                 <td className="px-4 py-3 text-red-600">{t.fail}</td>
-                <td className="px-4 py-3 text-yellow-600">{t.blocked}</td>
+                <td className="px-4 py-3 text-amber-600">{t.blocked}</td>
                 <td className="px-4 py-3">{t.passRate}%</td>
               </tr>
             ))}

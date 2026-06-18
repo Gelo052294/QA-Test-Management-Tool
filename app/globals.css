@@ -2,31 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---- Light theme: soft, low-glare palette ---- */
+/* ---- Light theme: warm neutral (sand / cream / taupe) with green accent ---- */
 :root {
-  --app: #e9ebf1; /* page background — muted cool gray, not bright white */
-  --surface: #f7f8fb; /* cards / panels — soft off-white */
-  --subtle: #e2e5ec; /* table headers, hovers, secondary fills */
-  --line: #d4d8e1; /* borders */
-  --ink: #2c3140; /* primary text — soft slate, not pure black */
-  --muted: #5e6675; /* secondary text */
-  --faint: #939bab; /* tertiary text */
-  --brand: 91 100 196; /* muted indigo (rgb channels) */
-  --brand-dark: 74 82 176;
+  --app: #ebe6dd; /* page background — warm sand, low glare */
+  --surface: #f6f2ea; /* cards / panels — warm cream */
+  --subtle: #e2dace; /* table headers, hovers, secondary fills — soft taupe */
+  --line: #d3c9ba; /* borders — warm tan */
+  --ink: #2e2a23; /* primary text — dark warm brown, not pure black */
+  --muted: #6c6356; /* secondary text — warm gray-brown */
+  --faint: #9b9284; /* tertiary text — muted taupe */
+  --brand: 76 110 73; /* natural muted green (rgb channels) */
+  --brand-dark: 60 90 58;
   color-scheme: light;
 }
 
-/* ---- Dark theme: deep, gentle palette ---- */
+/* ---- Dark theme: warm near-black (deep brown-gray) with green accent ---- */
 .dark {
-  --app: #0f1218; /* deep slate, not pure black */
-  --surface: #181c24; /* cards / panels */
-  --subtle: #1f242e; /* table headers, hovers */
-  --line: #2b313d; /* borders */
-  --ink: #dce0e8; /* primary text — soft off-white, easy on eyes */
-  --muted: #99a1b1;
-  --faint: #69727f;
-  --brand: 132 140 236; /* lighter indigo for contrast on dark */
-  --brand-dark: 112 121 224;
+  --app: #16130f; /* deep warm near-black */
+  --surface: #211d17; /* cards / panels — dark brown */
+  --subtle: #2a251e; /* table headers, hovers */
+  --line: #3a342b; /* borders — warm */
+  --ink: #e8e1d4; /* primary text — warm off-white, easy on eyes */
+  --muted: #a89e8e;
+  --faint: #766c5d;
+  --brand: 130 176 122; /* lighter green for contrast on dark */
+  --brand-dark: 112 158 104;
   color-scheme: dark;
 }
 

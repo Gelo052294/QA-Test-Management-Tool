@@ -50,7 +50,7 @@ export default async function MonthlyReportPage({
           <div className="text-xs text-muted">Failed</div>
         </div>
         <div className="card text-center">
-          <div className="text-2xl font-bold text-yellow-600">{report.counts.blocked}</div>
+          <div className="text-2xl font-bold text-amber-600">{report.counts.blocked}</div>
           <div className="text-xs text-muted">Blocked</div>
         </div>
         <div className="card text-center">

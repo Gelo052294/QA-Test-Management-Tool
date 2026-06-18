@@ -1,21 +1,21 @@
 const priorityColors: Record<string, string> = {
   low: "bg-subtle text-muted",
-  medium: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
-  high: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300",
+  medium: "bg-stone-200 text-stone-700 dark:bg-stone-500/20 dark:text-stone-300",
+  high: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
   critical: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
 };
 
 const tcStatusColors: Record<string, string> = {
   draft: "bg-subtle text-muted",
-  active: "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300",
+  active: "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300",
   deprecated: "bg-subtle text-faint",
 };
 
 export const execStatusColors: Record<string, string> = {
   not_run: "bg-subtle text-muted",
-  pass: "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300",
+  pass: "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300",
   fail: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
-  blocked: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-300",
+  blocked: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
 };
 
 function Pill({ text, className }: { text: string; className: string }) {
