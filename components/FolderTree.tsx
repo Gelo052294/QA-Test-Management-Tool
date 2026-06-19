@@ -6,6 +6,25 @@ import { useRouter } from "next/navigation";
 type Flat = { id: string; name: string; parentId: string | null };
 type Node = Flat & { children: Node[] };
 
+function FolderIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="shrink-0"
+    >
+      <path d="M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    </svg>
+  );
+}
+
 function buildTree(flat: Flat[]): Node[] {
   const byId = new Map<string, Node>();
   flat.forEach((f) => byId.set(f.id, { ...f, children: [] }));
@@ -88,8 +107,13 @@ export default function FolderTree({
           }`}
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
         >
-          <button onClick={() => go(n.id)} className="flex-1 truncate text-left" title={n.name}>
-            📁 {n.name}
+          <button
+            onClick={() => go(n.id)}
+            className="flex flex-1 items-center gap-1.5 truncate text-left"
+            title={n.name}
+          >
+            <FolderIcon />
+            <span className="truncate">{n.name}</span>
           </button>
           <span className="hidden gap-1 group-hover:flex">
             <button onClick={() => addFolder(n.id)} title="Add subfolder" className="text-faint hover:text-ink">＋</button>
