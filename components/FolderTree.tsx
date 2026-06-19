@@ -47,16 +47,46 @@ export default function FolderTree({
   kind,
   basePath,
   selectedId,
+  itemPatchBase,
 }: {
   folders: Flat[];
   projectId: string;
   kind: "testcase" | "cycle";
   basePath: string;
   selectedId: string | null;
+  // When set (e.g. "/api/cycles"), folders accept dropped items to reassign them.
+  itemPatchBase?: string;
 }) {
   const router = useRouter();
   const tree = buildTree(folders);
   const [busy, setBusy] = useState(false);
+  const [over, setOver] = useState<string | null>(null);
+
+  async function moveItem(itemId: string, folderId: string | null) {
+    if (!itemPatchBase || !itemId) return;
+    await fetch(`${itemPatchBase}/${itemId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ folderId }),
+    });
+    router.refresh();
+  }
+
+  function dropHandlers(folderId: string | null, key: string) {
+    if (!itemPatchBase) return {};
+    return {
+      onDragOver: (e: React.DragEvent) => {
+        e.preventDefault();
+        setOver(key);
+      },
+      onDragLeave: () => setOver((o) => (o === key ? null : o)),
+      onDrop: (e: React.DragEvent) => {
+        e.preventDefault();
+        setOver(null);
+        moveItem(e.dataTransfer.getData("text/plain"), folderId);
+      },
+    };
+  }
 
   async function addFolder(parentId: string | null) {
     const name = window.prompt(parentId ? "New subfolder name:" : "New folder name:");
@@ -102,9 +132,10 @@ export default function FolderTree({
     return nodes.map((n) => (
       <li key={n.id}>
         <div
+          {...dropHandlers(n.id, n.id)}
           className={`group flex items-center gap-1 rounded px-2 py-1 text-sm ${
             selectedId === n.id ? "bg-brand/10 text-brand" : "text-ink hover:bg-subtle"
-          }`}
+          } ${over === n.id ? "ring-2 ring-inset ring-brand" : ""}`}
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
         >
           <button
@@ -138,11 +169,12 @@ export default function FolderTree({
         <li>
           <button
             onClick={() => go(null)}
+            {...dropHandlers(null, "ALL")}
             className={`w-full rounded px-2 py-1 text-left text-sm ${
               selectedId === null ? "bg-brand/10 text-brand" : "text-ink hover:bg-subtle"
-            }`}
+            } ${over === "ALL" ? "ring-2 ring-inset ring-brand" : ""}`}
           >
-            All
+            All {itemPatchBase ? <span className="text-xs text-faint">(unfiled)</span> : null}
           </button>
         </li>
         {renderNodes(tree, 0)}
