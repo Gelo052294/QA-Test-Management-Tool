@@ -31,6 +31,9 @@ export default function TestCaseImportExport({ projectId }: { projectId: string 
 
   return (
     <div className="flex items-center gap-2">
+      <a href="/api/test-cases/template" className="text-sm text-brand hover:underline">
+        Template
+      </a>
       <a
         href={`/api/test-cases/export?projectId=${encodeURIComponent(projectId)}`}
         className="btn-secondary"

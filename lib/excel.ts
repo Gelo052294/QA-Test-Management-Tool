@@ -95,6 +95,39 @@ export function buildTestCaseWorkbook(
   return wb;
 }
 
+/** A blank import template: a Test Cases sheet (headers only) + an Instructions sheet. */
+export function buildTestCaseTemplate() {
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "QA Test Management";
+
+  const ws = wb.addWorksheet("Test Cases");
+  ws.columns = TEST_CASE_COLUMNS;
+  styleHeader(ws);
+
+  const info = wb.addWorksheet("Instructions");
+  info.columns = [
+    { header: "Column", key: "c", width: 16 },
+    { header: "How to fill it", key: "h", width: 70 },
+  ];
+  info.addRows([
+    { c: "Key", h: "Leave blank — assigned automatically (e.g. PROJ-T1) on import." },
+    { c: "Title", h: "Required. The test case name." },
+    { c: "Description", h: "Optional free text." },
+    { c: "Preconditions", h: "Optional free text." },
+    { c: "Priority", h: "One of: low, medium, high, critical (defaults to medium)." },
+    { c: "Status", h: "One of: draft, active, deprecated (defaults to active)." },
+    { c: "Folder", h: "Optional. Ignored on import (assign folders in the app)." },
+    { c: "Jira Key", h: "Optional, e.g. PROJ-123." },
+    {
+      c: "Steps",
+      h: 'One step per line as "action => expected result". Example: "1. Open /login => Form shows".',
+    },
+    { c: "Created By", h: "Leave blank — set to the importing user." },
+  ]);
+  styleHeader(info);
+  return wb;
+}
+
 export function buildCycleWorkbook(
   cycle: { name: string; key: string | null },
   summary: { total: number; passed: number; failed: number; blocked: number; notRun: number; passRate: number },

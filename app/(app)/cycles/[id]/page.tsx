@@ -5,6 +5,8 @@ import CycleExecutions from "@/components/CycleExecutions";
 import AddTestCases from "@/components/AddTestCases";
 import DeleteButton from "@/components/DeleteButton";
 import DuplicateCycleButton from "@/components/DuplicateCycleButton";
+import MoveToFolder from "@/components/MoveToFolder";
+import { listFolders, buildTree, flattenForSelect } from "@/lib/folders";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +32,10 @@ export default async function CycleDetailPage({
   });
 
   if (!cycle) notFound();
+
+  const folderOptions = cycle.projectId
+    ? flattenForSelect(buildTree(await listFolders(cycle.projectId, "cycle")))
+    : [];
 
   const total = cycle.executions.length;
   const count = (s: string) => cycle.executions.filter((e) => e.status === s).length;
@@ -71,10 +77,21 @@ export default async function CycleDetailPage({
           <Link href="/cycles" className="text-sm text-muted hover:underline">
             ← Back to cycles
           </Link>
-          <h1 className="mt-1 text-xl font-bold">{cycle.name}</h1>
+          <h1 className="mt-1 text-xl font-bold">
+            {cycle.key && <span className="mr-1 font-mono text-sm text-faint">{cycle.key}</span>}
+            {cycle.name}
+          </h1>
           {cycle.description && (
             <p className="mt-1 text-sm text-muted">{cycle.description}</p>
           )}
+          <div className="mt-2 flex items-center gap-2 text-sm text-muted">
+            <span>Folder:</span>
+            <MoveToFolder
+              endpoint={`/api/cycles/${cycle.id}`}
+              folders={folderOptions}
+              currentFolderId={cycle.folderId}
+            />
+          </div>
         </div>
         <div className="flex gap-2">
           <a href={`/api/cycles/${cycle.id}/export`} className="btn-secondary">

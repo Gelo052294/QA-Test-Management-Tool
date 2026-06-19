@@ -6,9 +6,10 @@ import JiraLink from "@/components/JiraLink";
 import SearchBox from "@/components/SearchBox";
 import TestCaseImportExport from "@/components/TestCaseImportExport";
 import FolderTree from "@/components/FolderTree";
+import MoveToFolder from "@/components/MoveToFolder";
 import EmptyProject from "@/components/EmptyProject";
 import { getCurrentProject } from "@/lib/project";
-import { listFolders } from "@/lib/folders";
+import { listFolders, buildTree, flattenForSelect } from "@/lib/folders";
 import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +45,7 @@ export default async function TestCasesPage({
     }),
   ]);
 
+  const folderOptions = flattenForSelect(buildTree(folders));
   const newHref = folderId ? `/test-cases/new?folderId=${folderId}` : "/test-cases/new";
 
   return (
@@ -106,7 +108,13 @@ export default async function TestCasesPage({
                     <td className="px-4 py-3">
                       <TestCaseStatusBadge value={tc.status} />
                     </td>
-                    <td className="px-4 py-3 text-muted">{tc.folderRef?.name ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      <MoveToFolder
+                        endpoint={`/api/test-cases/${tc.id}`}
+                        folders={folderOptions}
+                        currentFolderId={tc.folderId}
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       <JiraLink jiraKey={tc.jiraKey} />
                     </td>
