@@ -24,7 +24,11 @@ export async function PATCH(req: Request, { params }: Params) {
   const existing = await prisma.folder.findUnique({ where: { id } });
   if (!existing) return notFound("Folder not found");
 
-  const folder = await prisma.folder.update({ where: { id }, data: { name: parsed.data.name } });
+  const data: { name?: string; hidden?: boolean } = {};
+  if (parsed.data.name !== undefined) data.name = parsed.data.name;
+  if (parsed.data.hidden !== undefined) data.hidden = parsed.data.hidden;
+
+  const folder = await prisma.folder.update({ where: { id }, data });
   return json({ folder });
 }
 

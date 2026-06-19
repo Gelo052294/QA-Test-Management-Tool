@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Flat = { id: string; name: string; parentId: string | null };
+type Flat = { id: string; name: string; parentId: string | null; hidden?: boolean };
 type Node = Flat & { children: Node[] };
 
 function FolderIcon() {
@@ -61,6 +61,8 @@ export default function FolderTree({
   const tree = buildTree(folders);
   const [busy, setBusy] = useState(false);
   const [over, setOver] = useState<string | null>(null);
+  const [showHidden, setShowHidden] = useState(false);
+  const hiddenCount = folders.filter((f) => f.hidden).length;
 
   async function moveItem(itemId: string, folderId: string | null) {
     if (!itemPatchBase || !itemId) return;
@@ -124,37 +126,55 @@ export default function FolderTree({
     else router.refresh();
   }
 
+  async function setHidden(id: string, hidden: boolean) {
+    await fetch(`/api/folders/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hidden }),
+    });
+    if (hidden && selectedId === id) router.push(basePath);
+    else router.refresh();
+  }
+
   function go(id: string | null) {
     router.push(id ? `${basePath}?folderId=${id}` : basePath);
   }
 
   function renderNodes(nodes: Node[], depth: number) {
-    return nodes.map((n) => (
-      <li key={n.id}>
-        <div
-          {...dropHandlers(n.id, n.id)}
-          className={`group flex items-center gap-1 rounded px-2 py-1 text-sm ${
-            selectedId === n.id ? "bg-brand/10 text-brand" : "text-ink hover:bg-subtle"
-          } ${over === n.id ? "ring-2 ring-inset ring-brand" : ""}`}
-          style={{ paddingLeft: `${depth * 12 + 8}px` }}
-        >
-          <button
-            onClick={() => go(n.id)}
-            className="flex flex-1 items-center gap-1.5 truncate text-left"
-            title={n.name}
+    return nodes
+      .filter((n) => showHidden || !n.hidden)
+      .map((n) => (
+        <li key={n.id}>
+          <div
+            {...dropHandlers(n.id, n.id)}
+            className={`group flex items-center gap-1 rounded px-2 py-1 text-sm ${
+              selectedId === n.id ? "bg-brand/10 text-brand" : "text-ink hover:bg-subtle"
+            } ${over === n.id ? "ring-2 ring-inset ring-brand" : ""} ${n.hidden ? "opacity-50" : ""}`}
+            style={{ paddingLeft: `${depth * 12 + 8}px` }}
           >
-            <FolderIcon />
-            <span className="truncate">{n.name}</span>
-          </button>
-          <span className="hidden gap-1 group-hover:flex">
-            <button onClick={() => addFolder(n.id)} title="Add subfolder" className="text-faint hover:text-ink">＋</button>
-            <button onClick={() => rename(n.id, n.name)} title="Rename" className="text-faint hover:text-ink">✎</button>
-            <button onClick={() => remove(n.id)} title="Delete" className="text-faint hover:text-neg">✕</button>
-          </span>
-        </div>
-        {n.children.length > 0 && <ul>{renderNodes(n.children, depth + 1)}</ul>}
-      </li>
-    ));
+            <button
+              onClick={() => go(n.id)}
+              className="flex flex-1 items-center gap-1.5 truncate text-left"
+              title={n.name}
+            >
+              <FolderIcon />
+              <span className="truncate">{n.name}</span>
+              {n.hidden && <span className="text-xs text-faint">(hidden)</span>}
+            </button>
+            <span className="hidden gap-1 group-hover:flex">
+              <button onClick={() => addFolder(n.id)} title="Add subfolder" className="text-faint hover:text-ink">＋</button>
+              <button onClick={() => rename(n.id, n.name)} title="Rename" className="text-faint hover:text-ink">✎</button>
+              {n.hidden ? (
+                <button onClick={() => setHidden(n.id, false)} title="Unhide" className="text-faint hover:text-ink">🐵</button>
+              ) : (
+                <button onClick={() => setHidden(n.id, true)} title="Hide" className="text-faint hover:text-ink">🙈</button>
+              )}
+              <button onClick={() => remove(n.id)} title="Delete" className="text-faint hover:text-neg">✕</button>
+            </span>
+          </div>
+          {n.children.length > 0 && <ul>{renderNodes(n.children, depth + 1)}</ul>}
+        </li>
+      ));
   }
 
   return (
@@ -180,6 +200,16 @@ export default function FolderTree({
         {renderNodes(tree, 0)}
         {tree.length === 0 && (
           <li className="px-2 py-1 text-xs text-faint">No folders yet — “+ New”.</li>
+        )}
+        {hiddenCount > 0 && (
+          <li>
+            <button
+              onClick={() => setShowHidden((v) => !v)}
+              className="mt-1 w-full rounded px-2 py-1 text-left text-xs text-faint hover:bg-subtle hover:text-ink"
+            >
+              {showHidden ? "Hide hidden folders" : `Show hidden folders (${hiddenCount})`}
+            </button>
+          </li>
         )}
       </ul>
     </aside>

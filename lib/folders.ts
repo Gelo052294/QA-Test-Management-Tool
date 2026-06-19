@@ -4,11 +4,18 @@ export type FolderNode = {
   id: string;
   name: string;
   parentId: string | null;
+  hidden: boolean;
   children: FolderNode[];
   count: number;
 };
 
-type FlatFolder = { id: string; name: string; parentId: string | null; count: number };
+type FlatFolder = {
+  id: string;
+  name: string;
+  parentId: string | null;
+  hidden: boolean;
+  count: number;
+};
 
 /** Fetch folders for a project+kind with item counts, as a flat list. */
 export async function listFolders(
@@ -24,6 +31,7 @@ export async function listFolders(
     id: f.id,
     name: f.name,
     parentId: f.parentId,
+    hidden: f.hidden,
     count: kind === "testcase" ? f._count.testCases : f._count.cycles,
   }));
 }

@@ -36,7 +36,8 @@ export const folderCreateSchema = z.object({
 });
 
 export const folderUpdateSchema = z.object({
-  name: z.string().trim().min(1).max(80),
+  name: z.string().trim().min(1).max(80).optional(),
+  hidden: z.boolean().optional(),
 });
 
 export const testCaseCreateSchema = z.object({
