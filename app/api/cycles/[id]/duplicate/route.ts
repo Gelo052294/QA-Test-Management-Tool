@@ -50,6 +50,8 @@ export async function POST(req: Request, { params }: Params) {
       name: parsed.data.name.trim(),
       description: source.description,
       status: "active",
+      startDate: source.startDate,
+      endDate: source.endDate,
       createdById: user.id,
       executions: {
         create: source.executions.map((e) => ({

@@ -113,21 +113,23 @@ export default function CycleForm({
           </select>
         </div>
         <div>
-          <label className="label">Start date</label>
+          <label className="label">Start date *</label>
           <input
             type="date"
             className="input"
             value={values.startDate}
             onChange={(e) => set("startDate", e.target.value)}
+            required={!isEdit}
           />
         </div>
         <div>
-          <label className="label">End date</label>
+          <label className="label">End date *</label>
           <input
             type="date"
             className="input"
             value={values.endDate}
             onChange={(e) => set("endDate", e.target.value)}
+            required={!isEdit}
           />
         </div>
       </div>

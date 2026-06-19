@@ -54,21 +54,28 @@ export const testCaseCreateSchema = z.object({
 // Updates can't move a test case to another project or change its key.
 export const testCaseUpdateSchema = testCaseCreateSchema.omit({ projectId: true }).partial();
 
-export const cycleCreateSchema = z.object({
+const cycleBase = z.object({
   projectId: z.string().min(1, "Project is required"),
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   status: z.enum(["active", "completed"]).default("active"),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
+  startDate: z.coerce.date({ required_error: "Start date is required", invalid_type_error: "Start date is required" }),
+  endDate: z.coerce.date({ required_error: "End date is required", invalid_type_error: "End date is required" }),
   folderId: z.string().nullable().optional(),
 });
+
+// On create, both dates are required and end must not precede start.
+export const cycleCreateSchema = cycleBase.refine(
+  (d) => d.endDate >= d.startDate,
+  { message: "End date must be on or after the start date", path: ["endDate"] }
+);
 
 export const cycleDuplicateSchema = z.object({
   name: z.string().trim().min(1, "A new name is required"),
 });
 
-export const cycleUpdateSchema = cycleCreateSchema.omit({ projectId: true }).partial();
+// On edit, all fields optional (dates already set at creation).
+export const cycleUpdateSchema = cycleBase.omit({ projectId: true }).partial();
 
 export const addItemsSchema = z.object({
   testCaseIds: z.array(z.string().min(1)).min(1, "Pick at least one test case"),
