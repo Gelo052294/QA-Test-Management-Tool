@@ -2,6 +2,9 @@ import Link from "next/link";
 import { monthlyReport } from "@/lib/reports";
 import { ExecutionStatusBadge } from "@/components/Badges";
 import MonthPicker from "@/components/MonthPicker";
+import EmptyProject from "@/components/EmptyProject";
+import { getCurrentProject } from "@/lib/project";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +13,10 @@ export default async function MonthlyReportPage({
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
+  const user = await requireUser();
+  const project = await getCurrentProject();
+  if (!project) return <EmptyProject isAdmin={user.role === "admin"} />;
+
   const { month: monthParam } = await searchParams;
   const now = new Date();
   const month =
@@ -17,7 +24,7 @@ export default async function MonthlyReportPage({
       ? monthParam
       : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-  const report = await monthlyReport(month);
+  const report = await monthlyReport(month, project.id);
 
   return (
     <div>
@@ -30,7 +37,7 @@ export default async function MonthlyReportPage({
         </div>
         <div className="flex items-center gap-3">
           <MonthPicker month={month} />
-          <a href={`/api/reports/monthly?month=${month}&format=csv`} className="btn-secondary">
+          <a href={`/api/reports/monthly?month=${month}&projectId=${project.id}&format=csv`} className="btn-secondary">
             Export CSV
           </a>
         </div>

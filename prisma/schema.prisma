@@ -49,16 +49,32 @@ model User {
   apiToken     String?  @unique // Bearer token for programmatic API access
   createdAt    DateTime @default(now())
 
+  createdProjects   Project[]       @relation("ProjectCreatedBy")
   createdTestCases  TestCase[]      @relation("TestCaseCreatedBy")
   createdCycles     TestCycle[]     @relation("CycleCreatedBy")
   executions        TestExecution[] @relation("ExecutionExecutedBy")
   uploadedEvidence  Evidence[]      @relation("EvidenceUploadedBy")
 }
 
+model Project {
+  id          String   @id @default(cuid())
+  key         String   @unique // short uppercase code, e.g. AUR
+  name        String
+  description String?
+  tcCounter   Int      @default(0) // per-project test case number
+  cyCounter   Int      @default(0) // per-project cycle number
+  createdById String
+  createdBy   User     @relation("ProjectCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+
+  testCases TestCase[]
+  cycles    TestCycle[]
+}
+
 model TestCase {
   id            String           @id @default(cuid())
-  key           String           @unique // human-friendly, e.g. TC-1
-  seq           Int              @unique @default(autoincrement()) // backs the key number
+  key           String           @unique // human-friendly, e.g. AUR-T1
+  seq           Int              @unique @default(autoincrement()) // global tiebreaker
   title         String
   description   String?
   preconditions String?
@@ -67,6 +83,8 @@ model TestCase {
   status        TestCaseStatus   @default(active)
   folder        String?
   jiraKey       String? // e.g. PROJ-123 (link-only)
+  projectId     String? // made required after data migration
+  project       Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdById   String
   createdBy     User             @relation("TestCaseCreatedBy", fields: [createdById], references: [id])
   createdAt     DateTime         @default(now())
@@ -74,22 +92,28 @@ model TestCase {
 
   executions TestExecution[]
 
+  @@index([projectId])
   @@index([jiraKey])
   @@index([folder])
 }
 
 model TestCycle {
   id          String      @id @default(cuid())
+  key         String?     // e.g. AUR-C1 (uniqueness enforced via per-project counter)
   name        String
   description String?
   status      CycleStatus @default(active)
   startDate   DateTime?
   endDate     DateTime?
+  projectId   String? // made required after data migration
+  project     Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdById String
   createdBy   User        @relation("CycleCreatedBy", fields: [createdById], references: [id])
   createdAt   DateTime    @default(now())
 
   executions TestExecution[]
+
+  @@index([projectId])
 }
 
 model TestExecution {

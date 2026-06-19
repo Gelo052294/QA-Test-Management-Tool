@@ -2,11 +2,18 @@ import Link from "next/link";
 import { jiraCoverage } from "@/lib/reports";
 import { ExecutionStatusBadge } from "@/components/Badges";
 import JiraLink from "@/components/JiraLink";
+import EmptyProject from "@/components/EmptyProject";
+import { getCurrentProject } from "@/lib/project";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function JiraCoverageReportPage() {
-  const coverage = await jiraCoverage();
+  const user = await requireUser();
+  const project = await getCurrentProject();
+  if (!project) return <EmptyProject isAdmin={user.role === "admin"} />;
+
+  const coverage = await jiraCoverage(project.id);
 
   return (
     <div>
@@ -15,9 +22,11 @@ export default async function JiraCoverageReportPage() {
           <Link href="/reports" className="text-sm text-muted hover:underline">
             ← Reports
           </Link>
-          <h1 className="mt-1 text-xl font-bold">Jira coverage</h1>
+          <h1 className="mt-1 text-xl font-bold">
+            Jira coverage <span className="text-sm font-normal text-muted">· {project.key}</span>
+          </h1>
         </div>
-        <a href="/api/reports/jira-coverage?format=csv" className="btn-secondary">
+        <a href={`/api/reports/jira-coverage?projectId=${project.id}&format=csv`} className="btn-secondary">
           Export CSV
         </a>
       </div>

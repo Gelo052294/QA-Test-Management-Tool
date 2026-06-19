@@ -30,8 +30,10 @@ const empty: TestCaseFormValues = {
 
 export default function TestCaseForm({
   initial,
+  projectId,
 }: {
   initial?: TestCaseFormValues;
+  projectId?: string;
 }) {
   const router = useRouter();
   const isEdit = Boolean(initial?.id);
@@ -64,6 +66,7 @@ export default function TestCaseForm({
       steps: values.steps.filter((s) => s.step.trim() !== ""),
       jiraKey: values.jiraKey.trim() || undefined,
       folder: values.folder.trim() || undefined,
+      ...(isEdit ? {} : { projectId }),
     };
 
     const res = await fetch(

@@ -1,18 +1,33 @@
 import Link from "next/link";
 import TestCaseForm from "@/components/TestCaseForm";
+import EmptyProject from "@/components/EmptyProject";
+import { getCurrentProject } from "@/lib/project";
+import { requireUser } from "@/lib/session";
 
-export default function NewTestCasePage() {
+export const dynamic = "force-dynamic";
+
+export default async function NewTestCasePage() {
+  const user = await requireUser();
+  const project = await getCurrentProject();
+
   return (
     <div>
       <div className="mb-5">
         <Link href="/test-cases" className="text-sm text-muted hover:underline">
           ← Back to test cases
         </Link>
-        <h1 className="mt-1 text-xl font-bold">New Test Case</h1>
+        <h1 className="mt-1 text-xl font-bold">
+          New Test Case
+          {project && <span className="ml-2 text-sm font-normal text-muted">in {project.key}</span>}
+        </h1>
       </div>
-      <div className="card">
-        <TestCaseForm />
-      </div>
+      {project ? (
+        <div className="card">
+          <TestCaseForm projectId={project.id} />
+        </div>
+      ) : (
+        <EmptyProject isAdmin={user.role === "admin"} />
+      )}
     </div>
   );
 }

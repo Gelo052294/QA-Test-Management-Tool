@@ -7,9 +7,11 @@ export async function GET(req: Request) {
   const user = await getApiUser(req);
   if (!user) return unauthorized();
 
-  const rows = await testerActivity();
+  const { searchParams } = new URL(req.url);
+  const projectId = searchParams.get("projectId")?.trim() || undefined;
+  const rows = await testerActivity(projectId);
 
-  if (new URL(req.url).searchParams.get("format") === "csv") {
+  if (searchParams.get("format") === "csv") {
     const csv = toCsv(rows, [
       { key: "name", header: "Name" },
       { key: "email", header: "Email" },

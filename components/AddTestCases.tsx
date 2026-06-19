@@ -7,9 +7,11 @@ type TC = { id: string; key: string; title: string; folder: string | null };
 
 export default function AddTestCases({
   cycleId,
+  projectId,
   existingIds,
 }: {
   cycleId: string;
+  projectId: string;
   existingIds: string[];
 }) {
   const router = useRouter();
@@ -23,11 +25,11 @@ export default function AddTestCases({
   useEffect(() => {
     if (!open) return;
     setLoading(true);
-    fetch("/api/test-cases")
+    fetch(`/api/test-cases?projectId=${encodeURIComponent(projectId)}`)
       .then((r) => r.json())
       .then((d) => setAll(d.testCases ?? []))
       .finally(() => setLoading(false));
-  }, [open]);
+  }, [open, projectId]);
 
   const existing = new Set(existingIds);
   const available = all

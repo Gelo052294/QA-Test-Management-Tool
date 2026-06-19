@@ -26,11 +26,14 @@ export async function POST(req: Request, { params }: Params) {
     return badRequest("Invalid input", parsed.error.flatten().fieldErrors);
   }
 
+  // Only allow test cases that belong to the same project as the cycle.
+  const sameProject = await prisma.testCase.findMany({
+    where: { id: { in: parsed.data.testCaseIds }, projectId: cycle.projectId },
+    select: { id: true },
+  });
+
   const result = await prisma.testExecution.createMany({
-    data: parsed.data.testCaseIds.map((testCaseId) => ({
-      cycleId: id,
-      testCaseId,
-    })),
+    data: sameProject.map((tc) => ({ cycleId: id, testCaseId: tc.id })),
     skipDuplicates: true,
   });
 

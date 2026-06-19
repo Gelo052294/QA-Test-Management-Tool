@@ -1,10 +1,18 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import EmptyProject from "@/components/EmptyProject";
+import { getCurrentProject } from "@/lib/project";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function CyclesPage() {
+  const user = await requireUser();
+  const project = await getCurrentProject();
+  if (!project) return <EmptyProject isAdmin={user.role === "admin"} />;
+
   const cycles = await prisma.testCycle.findMany({
+    where: { projectId: project.id },
     orderBy: { createdAt: "desc" },
     include: {
       createdBy: { select: { name: true } },
@@ -15,7 +23,9 @@ export default async function CyclesPage() {
   return (
     <div>
       <div className="mb-5 flex items-center justify-between">
-        <h1 className="text-xl font-bold">Test Cycles</h1>
+        <h1 className="text-xl font-bold">
+          Test Cycles <span className="text-sm font-normal text-muted">· {project.key}</span>
+        </h1>
         <Link href="/cycles/new" className="btn-primary">
           + New cycle
         </Link>
@@ -30,7 +40,10 @@ export default async function CyclesPage() {
           return (
             <Link key={c.id} href={`/cycles/${c.id}`} className="card hover:shadow-md">
               <div className="mb-2 flex items-center justify-between">
-                <h2 className="font-semibold">{c.name}</h2>
+                <h2 className="font-semibold">
+                  {c.key && <span className="mr-1 font-mono text-xs text-faint">{c.key}</span>}
+                  {c.name}
+                </h2>
                 <span
                   className={`rounded px-2 py-0.5 text-xs ${
                     c.status === "active"

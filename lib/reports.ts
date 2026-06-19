@@ -55,15 +55,17 @@ export async function cycleSummary(cycleId: string) {
   };
 }
 
-/** 2. Monthly execution report — executions stamped within the given YYYY-MM. */
-export async function monthlyReport(month: string) {
-  // month = "YYYY-MM"
+/** 2. Monthly execution report — executions stamped within the given YYYY-MM (optionally scoped to a project). */
+export async function monthlyReport(month: string, projectId?: string) {
   const [y, m] = month.split("-").map(Number);
   const start = new Date(Date.UTC(y, m - 1, 1));
   const end = new Date(Date.UTC(y, m, 1));
 
   const executions = await prisma.testExecution.findMany({
-    where: { executedAt: { gte: start, lt: end } },
+    where: {
+      executedAt: { gte: start, lt: end },
+      ...(projectId ? { cycle: { projectId } } : {}),
+    },
     include: {
       executedBy: { select: { name: true } },
       testCase: { select: { key: true, title: true } },
@@ -103,27 +105,42 @@ export async function monthlyReport(month: string) {
   };
 }
 
-/** 3. Per-tester activity — created test cases + executions run. */
-export async function testerActivity() {
+/** 3. Per-tester activity — created test cases + executions run (optionally scoped to a project). */
+export async function testerActivity(projectId?: string) {
   const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      _count: { select: { createdTestCases: true } },
-      executions: { select: { status: true } },
-    },
+    select: { id: true, name: true, email: true },
     orderBy: { name: "asc" },
   });
 
+  const created = await prisma.testCase.groupBy({
+    by: ["createdById"],
+    where: projectId ? { projectId } : {},
+    _count: { _all: true },
+  });
+  const createdByUser = new Map(created.map((c) => [c.createdById, c._count._all]));
+
+  const execs = await prisma.testExecution.groupBy({
+    by: ["executedById", "status"],
+    where: {
+      executedById: { not: null },
+      ...(projectId ? { cycle: { projectId } } : {}),
+    },
+    _count: { _all: true },
+  });
+  const execByUser = new Map<string, StatusCounts>();
+  for (const e of execs) {
+    if (!e.executedById) continue;
+    if (!execByUser.has(e.executedById)) execByUser.set(e.executedById, emptyCounts());
+    execByUser.get(e.executedById)![e.status] += e._count._all;
+  }
+
   return users.map((u) => {
-    const counts = emptyCounts();
-    for (const e of u.executions) counts[e.status] += 1;
+    const counts = execByUser.get(u.id) ?? emptyCounts();
     const ran = counts.pass + counts.fail + counts.blocked;
     return {
       name: u.name,
       email: u.email,
-      testCasesCreated: u._count.createdTestCases,
+      testCasesCreated: createdByUser.get(u.id) ?? 0,
       executionsRun: ran,
       ...counts,
       passRate: rate(counts.pass, ran),
@@ -131,10 +148,10 @@ export async function testerActivity() {
   });
 }
 
-/** 4. Jira coverage — group linked test cases + their latest result. */
-export async function jiraCoverage() {
+/** 4. Jira coverage — group linked test cases + their latest result (optionally scoped to a project). */
+export async function jiraCoverage(projectId?: string) {
   const testCases = await prisma.testCase.findMany({
-    where: { jiraKey: { not: null } },
+    where: { jiraKey: { not: null }, ...(projectId ? { projectId } : {}) },
     include: {
       executions: {
         orderBy: [{ executedAt: "desc" }, { createdAt: "desc" }],

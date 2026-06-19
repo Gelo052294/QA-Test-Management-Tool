@@ -4,6 +4,9 @@ import { Prisma } from "@prisma/client";
 import { PriorityBadge, TestCaseStatusBadge } from "@/components/Badges";
 import JiraLink from "@/components/JiraLink";
 import SearchBox from "@/components/SearchBox";
+import EmptyProject from "@/components/EmptyProject";
+import { getCurrentProject } from "@/lib/project";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -12,17 +15,24 @@ export default async function TestCasesPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  const user = await requireUser();
+  const project = await getCurrentProject();
+  if (!project) return <EmptyProject isAdmin={user.role === "admin"} />;
+
   const { q } = await searchParams;
-  const where: Prisma.TestCaseWhereInput = q
-    ? {
-        OR: [
-          { title: { contains: q, mode: "insensitive" } },
-          { key: { contains: q, mode: "insensitive" } },
-          { folder: { contains: q, mode: "insensitive" } },
-          { jiraKey: { contains: q, mode: "insensitive" } },
-        ],
-      }
-    : {};
+  const where: Prisma.TestCaseWhereInput = {
+    projectId: project.id,
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q, mode: "insensitive" } },
+            { key: { contains: q, mode: "insensitive" } },
+            { folder: { contains: q, mode: "insensitive" } },
+            { jiraKey: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
 
   const testCases = await prisma.testCase.findMany({
     where,
@@ -33,7 +43,9 @@ export default async function TestCasesPage({
   return (
     <div>
       <div className="mb-5 flex items-center justify-between">
-        <h1 className="text-xl font-bold">Test Cases</h1>
+        <h1 className="text-xl font-bold">
+          Test Cases <span className="text-sm font-normal text-muted">· {project.key}</span>
+        </h1>
         <Link href="/test-cases/new" className="btn-primary">
           + New test case
         </Link>

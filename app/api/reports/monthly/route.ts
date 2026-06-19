@@ -12,8 +12,9 @@ export async function GET(req: Request) {
   if (!month || !/^\d{4}-\d{2}$/.test(month)) {
     return badRequest("month is required in YYYY-MM format");
   }
+  const projectId = searchParams.get("projectId")?.trim() || undefined;
 
-  const report = await monthlyReport(month);
+  const report = await monthlyReport(month, projectId);
 
   if (searchParams.get("format") === "csv") {
     const csv = toCsv(report.rows, [

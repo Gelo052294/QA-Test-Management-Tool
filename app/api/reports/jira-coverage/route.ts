@@ -7,9 +7,11 @@ export async function GET(req: Request) {
   const user = await getApiUser(req);
   if (!user) return unauthorized();
 
-  const groups = await jiraCoverage();
+  const { searchParams } = new URL(req.url);
+  const projectId = searchParams.get("projectId")?.trim() || undefined;
+  const groups = await jiraCoverage(projectId);
 
-  if (new URL(req.url).searchParams.get("format") === "csv") {
+  if (searchParams.get("format") === "csv") {
     const flat = groups.flatMap((g) =>
       g.testCases.map((tc) => ({
         jiraKey: g.jiraKey,

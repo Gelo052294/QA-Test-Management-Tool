@@ -111,6 +111,7 @@ export default async function CycleDetailPage({
         <h2 className="font-semibold">Test cases ({total})</h2>
         <AddTestCases
           cycleId={cycle.id}
+          projectId={cycle.projectId ?? ""}
           existingIds={cycle.executions.map((e) => e.testCaseId)}
         />
       </div>

@@ -1,14 +1,20 @@
-import { randomUUID } from "crypto";
 import { prisma } from "@/lib/db";
-import { getApiUser, json, unauthorized, badRequest } from "@/lib/apiAuth";
+import {
+  getApiUser,
+  json,
+  unauthorized,
+  badRequest,
+  notFound,
+} from "@/lib/apiAuth";
 import { testCaseCreateSchema } from "@/lib/validation";
 
-// GET /api/test-cases?q=&folder=&jiraKey=&status=
+// GET /api/test-cases?projectId=&q=&folder=&jiraKey=&status=
 export async function GET(req: Request) {
   const user = await getApiUser(req);
   if (!user) return unauthorized();
 
   const { searchParams } = new URL(req.url);
+  const projectId = searchParams.get("projectId")?.trim();
   const q = searchParams.get("q")?.trim();
   const folder = searchParams.get("folder")?.trim();
   const jiraKey = searchParams.get("jiraKey")?.trim();
@@ -16,6 +22,7 @@ export async function GET(req: Request) {
 
   const testCases = await prisma.testCase.findMany({
     where: {
+      ...(projectId ? { projectId } : {}),
       ...(folder ? { folder } : {}),
       ...(jiraKey ? { jiraKey } : {}),
       ...(status ? { status: status as any } : {}),
@@ -47,11 +54,19 @@ export async function POST(req: Request) {
     return badRequest("Invalid input", parsed.error.flatten().fieldErrors);
   }
 
-  // Create with a temporary unique key, then derive the human key from the
-  // DB-assigned auto-increment `seq` (race-free, no manual counter).
-  const created = await prisma.testCase.create({
+  // Atomically bump the project's test-case counter to derive the key (PROJ-T<n>).
+  const project = await prisma.project
+    .update({
+      where: { id: parsed.data.projectId },
+      data: { tcCounter: { increment: 1 } },
+    })
+    .catch(() => null);
+  if (!project) return notFound("Project not found");
+
+  const testCase = await prisma.testCase.create({
     data: {
-      key: `tmp-${randomUUID()}`,
+      key: `${project.key}-T${project.tcCounter}`,
+      projectId: project.id,
       title: parsed.data.title,
       description: parsed.data.description,
       preconditions: parsed.data.preconditions,
@@ -62,11 +77,6 @@ export async function POST(req: Request) {
       jiraKey: parsed.data.jiraKey,
       createdById: user.id,
     },
-  });
-
-  const testCase = await prisma.testCase.update({
-    where: { id: created.id },
-    data: { key: `TC-${created.seq}` },
   });
 
   return json({ testCase }, 201);

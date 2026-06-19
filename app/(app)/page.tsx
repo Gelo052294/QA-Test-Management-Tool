@@ -1,16 +1,23 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { ExecutionStatusBadge } from "@/components/Badges";
+import EmptyProject from "@/components/EmptyProject";
+import { getCurrentProject } from "@/lib/project";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const user = await requireUser();
+  const project = await getCurrentProject();
+  if (!project) return <EmptyProject isAdmin={user.role === "admin"} />;
+
   const [testCaseCount, activeCycles, totalCycles, recent] = await Promise.all([
-    prisma.testCase.count(),
-    prisma.testCycle.count({ where: { status: "active" } }),
-    prisma.testCycle.count(),
+    prisma.testCase.count({ where: { projectId: project.id } }),
+    prisma.testCycle.count({ where: { projectId: project.id, status: "active" } }),
+    prisma.testCycle.count({ where: { projectId: project.id } }),
     prisma.testExecution.findMany({
-      where: { executedAt: { not: null } },
+      where: { executedAt: { not: null }, cycle: { projectId: project.id } },
       orderBy: { executedAt: "desc" },
       take: 8,
       include: {
@@ -29,7 +36,9 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-5 text-xl font-bold">Dashboard</h1>
+      <h1 className="mb-5 text-xl font-bold">
+        Dashboard <span className="text-sm font-normal text-muted">· {project.key} — {project.name}</span>
+      </h1>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {cards.map((c) => (

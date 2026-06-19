@@ -20,7 +20,13 @@ const empty: CycleFormValues = {
   endDate: "",
 };
 
-export default function CycleForm({ initial }: { initial?: CycleFormValues }) {
+export default function CycleForm({
+  initial,
+  projectId,
+}: {
+  initial?: CycleFormValues;
+  projectId?: string;
+}) {
   const router = useRouter();
   const isEdit = Boolean(initial?.id);
   const [values, setValues] = useState<CycleFormValues>(initial ?? empty);
@@ -42,6 +48,7 @@ export default function CycleForm({ initial }: { initial?: CycleFormValues }) {
       status: values.status,
       startDate: values.startDate || undefined,
       endDate: values.endDate || undefined,
+      ...(isEdit ? {} : { projectId }),
     };
 
     const res = await fetch(

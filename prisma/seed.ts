@@ -28,12 +28,27 @@ async function main() {
     },
   });
 
-  // A couple of demo test cases
-  const tc1 = await prisma.testCase.upsert({
-    where: { key: "TC-1" },
+  // Demo project (test cases & cycles live inside a project)
+  const project = await prisma.project.upsert({
+    where: { key: "DEMO" },
     update: {},
     create: {
-      key: "TC-1",
+      key: "DEMO",
+      name: "Demo Project",
+      description: "Sample project with demo test cases and a cycle.",
+      tcCounter: 2,
+      cyCounter: 1,
+      createdById: admin.id,
+    },
+  });
+
+  // A couple of demo test cases
+  const tc1 = await prisma.testCase.upsert({
+    where: { key: "DEMO-T1" },
+    update: {},
+    create: {
+      key: "DEMO-T1",
+      projectId: project.id,
       title: "User can log in with valid credentials",
       description: "Verify a registered user can sign in.",
       preconditions: "A user account exists.",
@@ -51,10 +66,11 @@ async function main() {
   });
 
   const tc2 = await prisma.testCase.upsert({
-    where: { key: "TC-2" },
+    where: { key: "DEMO-T2" },
     update: {},
     create: {
-      key: "TC-2",
+      key: "DEMO-T2",
+      projectId: project.id,
       title: "User cannot log in with wrong password",
       description: "Verify invalid credentials are rejected.",
       preconditions: "A user account exists.",
@@ -74,6 +90,8 @@ async function main() {
   // A demo cycle with both test cases queued for execution
   const cycle = await prisma.testCycle.create({
     data: {
+      key: "DEMO-C1",
+      projectId: project.id,
       name: "Sprint 1 Regression",
       description: "Smoke + auth regression for Sprint 1.",
       status: "active",

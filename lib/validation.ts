@@ -13,7 +13,23 @@ const step = z.object({
   expectedResult: z.string().default(""),
 });
 
+export const projectCreateSchema = z.object({
+  key: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z][A-Z0-9]{1,9}$/, "Key must be 2-10 letters/digits, starting with a letter"),
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+});
+
+export const projectUpdateSchema = z.object({
+  name: z.string().min(1).optional(),
+  description: z.string().optional(),
+});
+
 export const testCaseCreateSchema = z.object({
+  projectId: z.string().min(1, "Project is required"),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   preconditions: z.string().optional(),
@@ -24,9 +40,11 @@ export const testCaseCreateSchema = z.object({
   jiraKey,
 });
 
-export const testCaseUpdateSchema = testCaseCreateSchema.partial();
+// Updates can't move a test case to another project or change its key.
+export const testCaseUpdateSchema = testCaseCreateSchema.omit({ projectId: true }).partial();
 
 export const cycleCreateSchema = z.object({
+  projectId: z.string().min(1, "Project is required"),
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   status: z.enum(["active", "completed"]).default("active"),
@@ -34,7 +52,7 @@ export const cycleCreateSchema = z.object({
   endDate: z.coerce.date().optional(),
 });
 
-export const cycleUpdateSchema = cycleCreateSchema.partial();
+export const cycleUpdateSchema = cycleCreateSchema.omit({ projectId: true }).partial();
 
 export const addItemsSchema = z.object({
   testCaseIds: z.array(z.string().min(1)).min(1, "Pick at least one test case"),

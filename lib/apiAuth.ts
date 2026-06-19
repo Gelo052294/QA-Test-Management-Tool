@@ -35,6 +35,10 @@ export function unauthorized() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 
+export function forbidden(message = "Admins only") {
+  return NextResponse.json({ error: message }, { status: 403 });
+}
+
 export function badRequest(message: string, details?: unknown) {
   return NextResponse.json({ error: message, details }, { status: 400 });
 }

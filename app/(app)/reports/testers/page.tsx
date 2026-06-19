@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { testerActivity } from "@/lib/reports";
+import EmptyProject from "@/components/EmptyProject";
+import { getCurrentProject } from "@/lib/project";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function TestersReportPage() {
-  const testers = await testerActivity();
+  const user = await requireUser();
+  const project = await getCurrentProject();
+  if (!project) return <EmptyProject isAdmin={user.role === "admin"} />;
+
+  const testers = await testerActivity(project.id);
 
   return (
     <div>
@@ -13,9 +20,11 @@ export default async function TestersReportPage() {
           <Link href="/reports" className="text-sm text-muted hover:underline">
             ← Reports
           </Link>
-          <h1 className="mt-1 text-xl font-bold">Per-tester activity</h1>
+          <h1 className="mt-1 text-xl font-bold">
+            Per-tester activity <span className="text-sm font-normal text-muted">· {project.key}</span>
+          </h1>
         </div>
-        <a href="/api/reports/testers?format=csv" className="btn-secondary">
+        <a href={`/api/reports/testers?projectId=${project.id}&format=csv`} className="btn-secondary">
           Export CSV
         </a>
       </div>

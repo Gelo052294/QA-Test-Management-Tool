@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/session";
+import { listProjects, getCurrentProject } from "@/lib/project";
 import NavLink from "@/components/NavLink";
 import SignOutButton from "@/components/SignOutButton";
 import ThemeToggle from "@/components/ThemeToggle";
+import ProjectSwitcher from "@/components/ProjectSwitcher";
 
 export default async function AppLayout({
   children,
@@ -10,20 +12,26 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
+  const [projects, current] = await Promise.all([listProjects(), getCurrentProject()]);
 
   return (
     <div className="min-h-screen">
       <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             <Link href="/" className="text-lg font-bold text-brand">
               QA TMS
             </Link>
+            <ProjectSwitcher
+              projects={projects.map((p) => ({ id: p.id, key: p.key, name: p.name }))}
+              currentId={current?.id ?? null}
+            />
             <nav className="flex items-center gap-1">
               <NavLink href="/" label="Dashboard" />
               <NavLink href="/test-cases" label="Test Cases" />
               <NavLink href="/cycles" label="Test Cycles" />
               <NavLink href="/reports" label="Reports" />
+              {user.role === "admin" && <NavLink href="/projects" label="Projects" />}
               <NavLink href="/settings" label="Settings" />
             </nav>
           </div>
