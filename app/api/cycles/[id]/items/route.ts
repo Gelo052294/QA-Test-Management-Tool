@@ -7,6 +7,7 @@ import {
   notFound,
 } from "@/lib/apiAuth";
 import { addItemsSchema } from "@/lib/validation";
+import { recordCycleHistory } from "@/lib/history";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -29,13 +30,27 @@ export async function POST(req: Request, { params }: Params) {
   // Only allow test cases that belong to the same project as the cycle.
   const sameProject = await prisma.testCase.findMany({
     where: { id: { in: parsed.data.testCaseIds }, projectId: cycle.projectId },
-    select: { id: true },
+    select: { id: true, key: true },
   });
 
+  // Determine which are genuinely new (not already in the cycle) for the audit log.
+  const already = await prisma.testExecution.findMany({
+    where: { cycleId: id, testCaseId: { in: sameProject.map((t) => t.id) } },
+    select: { testCaseId: true },
+  });
+  const alreadySet = new Set(already.map((a) => a.testCaseId));
+  const added = sameProject.filter((t) => !alreadySet.has(t.id));
+
   const result = await prisma.testExecution.createMany({
-    data: sameProject.map((tc) => ({ cycleId: id, testCaseId: tc.id })),
+    data: added.map((tc) => ({ cycleId: id, testCaseId: tc.id })),
     skipDuplicates: true,
   });
+
+  if (added.length) {
+    await recordCycleHistory(id, user.id, [
+      { field: "Test cases", oldValue: "-", newValue: added.map((t) => t.key).join(", ") },
+    ]);
+  }
 
   return json({ added: result.count }, 201);
 }

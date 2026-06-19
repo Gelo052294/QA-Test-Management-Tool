@@ -28,6 +28,11 @@ export default async function CycleDetailPage({
         },
         orderBy: { createdAt: "asc" },
       },
+      history: {
+        include: { changedBy: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 300,
+      },
     },
   });
 
@@ -139,6 +144,48 @@ export default async function CycleDetailPage({
       </div>
 
       <CycleExecutions executions={rows} />
+
+      <details className="card mt-6">
+        <summary className="cursor-pointer font-semibold">
+          History ({cycle.history.length})
+        </summary>
+        <div className="mt-3 overflow-x-auto">
+          {cycle.history.length === 0 ? (
+            <p className="text-sm text-muted">No changes recorded yet.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="border-b border-line text-left text-xs uppercase text-muted">
+                <tr>
+                  <th className="py-2 pr-4">Changed By</th>
+                  <th className="py-2 pr-4">Date</th>
+                  <th className="py-2 pr-4">Field</th>
+                  <th className="py-2 pr-4">Original Value</th>
+                  <th className="py-2">New Value</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {cycle.history.map((h) => (
+                  <tr key={h.id} className="align-top">
+                    <td className="py-2 pr-4 whitespace-nowrap">{h.changedBy.name}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap text-muted">
+                      {h.createdAt.toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{h.field}</td>
+                    <td className="py-2 pr-4 break-words text-muted">{h.oldValue ?? "-"}</td>
+                    <td className="py-2 break-words">{h.newValue ?? "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </details>
     </div>
   );
 }

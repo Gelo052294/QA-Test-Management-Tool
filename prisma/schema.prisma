@@ -59,6 +59,7 @@ model User {
   createdCycles     TestCycle[]     @relation("CycleCreatedBy")
   executions        TestExecution[] @relation("ExecutionExecutedBy")
   uploadedEvidence  Evidence[]      @relation("EvidenceUploadedBy")
+  cycleChanges      CycleHistory[]  @relation("CycleHistoryChangedBy")
 }
 
 model Project {
@@ -140,9 +141,24 @@ model TestCycle {
   createdAt   DateTime    @default(now())
 
   executions TestExecution[]
+  history    CycleHistory[]
 
   @@index([projectId])
   @@index([folderId])
+}
+
+model CycleHistory {
+  id          String    @id @default(cuid())
+  cycleId     String
+  cycle       TestCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  changedById String
+  changedBy   User      @relation("CycleHistoryChangedBy", fields: [changedById], references: [id])
+  field       String // e.g. "Name", "Folder", "Executed by (AUR-T1)", "Test cases"
+  oldValue    String?
+  newValue    String?
+  createdAt   DateTime  @default(now())
+
+  @@index([cycleId, createdAt])
 }
 
 model TestExecution {

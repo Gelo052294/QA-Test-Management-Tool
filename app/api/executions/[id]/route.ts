@@ -7,6 +7,7 @@ import {
   notFound,
 } from "@/lib/apiAuth";
 import { executionUpdateSchema } from "@/lib/validation";
+import { recordCycleHistory, HistoryEntry } from "@/lib/history";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -22,7 +23,13 @@ export async function PATCH(req: Request, { params }: Params) {
     return badRequest("Invalid input", parsed.error.flatten().fieldErrors);
   }
 
-  const existing = await prisma.testExecution.findUnique({ where: { id } });
+  const existing = await prisma.testExecution.findUnique({
+    where: { id },
+    include: {
+      testCase: { select: { key: true } },
+      executedBy: { select: { name: true } },
+    },
+  });
   if (!existing) return notFound("Execution not found");
 
   const ran = parsed.data.status !== "not_run";
@@ -37,6 +44,18 @@ export async function PATCH(req: Request, { params }: Params) {
       executedAt: ran ? new Date() : null,
     },
   });
+
+  // Audit log on the parent cycle (Zephyr-style).
+  const key = existing.testCase.key;
+  const entries: HistoryEntry[] = [
+    { field: `Result (${key})`, oldValue: existing.status, newValue: execution.status },
+    {
+      field: `Executed by (${key})`,
+      oldValue: existing.executedBy?.name ?? "-",
+      newValue: ran ? user.name : "-",
+    },
+  ];
+  await recordCycleHistory(existing.cycleId, user.id, entries);
 
   return json({ execution });
 }
