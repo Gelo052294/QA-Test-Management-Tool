@@ -22,6 +22,10 @@ const config: Config = {
         ink: "var(--ink)",
         muted: "var(--muted)",
         faint: "var(--faint)",
+        // status text colors (theme-adaptive)
+        pos: "var(--pos)",
+        neg: "var(--neg)",
+        warn: "var(--warn)",
       },
     },
   },

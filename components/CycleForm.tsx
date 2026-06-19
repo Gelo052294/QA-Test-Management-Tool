@@ -116,7 +116,7 @@ export default function CycleForm({ initial }: { initial?: CycleFormValues }) {
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-neg">{error}</p>}
 
       <div className="flex gap-3">
         <button type="submit" className="btn-primary" disabled={saving}>

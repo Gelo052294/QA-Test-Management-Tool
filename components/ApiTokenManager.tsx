@@ -37,8 +37,8 @@ export default function ApiTokenManager({ hasToken }: { hasToken: boolean }) {
       </p>
 
       {token && (
-        <div className="rounded-md border border-green-200 bg-green-50 p-3 dark:border-green-500/30 dark:bg-green-500/10">
-          <p className="mb-1 text-sm font-medium text-green-800 dark:text-green-300">
+        <div className="rounded-md border border-[#cfe6d6] bg-[#eaf5ee] p-3 dark:border-[#2c4636] dark:bg-[#1a2c21]">
+          <p className="mb-1 text-sm font-medium text-[#357d52] dark:text-[#82d6a0]">
             Your new token (copy it now — it won’t be shown again):
           </p>
           <div className="flex items-center gap-2">

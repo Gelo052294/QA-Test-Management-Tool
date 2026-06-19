@@ -2,36 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---- Light theme: crisp cool neutrals (GitHub-style) with green accent ---- */
+/* ---- Light theme: soft pastel, low-glare ---- */
 :root {
-  --app: #f6f8fa; /* page background — light cool gray */
-  --surface: #ffffff; /* cards / panels — clean white */
-  --subtle: #eaeef2; /* table headers, hovers, secondary fills */
-  --line: #d1d9e0; /* borders — crisp */
-  --ink: #1f2328; /* primary text — high-contrast near-black */
-  --muted: #59636e; /* secondary text */
-  --faint: #818b98; /* tertiary text */
-  --brand: 31 136 61; /* GitHub primary green (rgb channels) */
-  --brand-dark: 26 127 55;
+  --app: #f3f5f8; /* page background — very soft gray */
+  --surface: #fcfcfd; /* cards / panels — gentle off-white */
+  --subtle: #eef1f5; /* table headers, hovers, secondary fills */
+  --line: #e3e7ed; /* borders — soft */
+  --ink: #3b424f; /* primary text — soft slate, not harsh black */
+  --muted: #6b7480; /* secondary text */
+  --faint: #9aa3af; /* tertiary text */
+
+  --brand: 90 162 122; /* soft sage-green accent (links, active, focus) */
+  --brand-dark: 74 142 105;
+  --brand-soft: #dcefe3; /* pastel button fill */
+  --brand-strong: #2f7d50; /* button text */
+  --brand-soft-hover: #cfe8d8;
+
+  --danger-soft: #f8dedb; /* pastel danger button */
+  --danger-strong: #a85650;
+  --danger-soft-hover: #f3d2ce;
+
+  /* status text colors (theme-adaptive) */
+  --pos: #3f8a5e;
+  --neg: #b46560;
+  --warn: #997a2e;
   color-scheme: light;
 }
 
-/* ---- Dark theme: GitHub dark neutrals with green accent ---- */
+/* ---- Dark theme: soft muted, gentle on the eyes ---- */
 .dark {
-  --app: #0d1117; /* canvas */
-  --surface: #161b22; /* cards / panels */
-  --subtle: #21262d; /* table headers, hovers */
-  --line: #30363d; /* borders */
-  --ink: #e6edf3; /* primary text — crisp off-white */
-  --muted: #9198a1;
-  --faint: #6e7681;
-  --brand: 46 160 67; /* green accent for dark */
-  --brand-dark: 35 134 54;
+  --app: #0f141a; /* deep, slightly cool near-black */
+  --surface: #171d26; /* cards / panels */
+  --subtle: #1f2630; /* table headers, hovers */
+  --line: #2c343f; /* borders */
+  --ink: #ccd3de; /* primary text — soft off-white, not stark */
+  --muted: #8d97a4;
+  --faint: #69727f;
+
+  --brand: 130 200 158; /* soft pastel green accent for dark */
+  --brand-dark: 112 182 140;
+  --brand-soft: #21392c; /* muted green button fill */
+  --brand-strong: #8fe0ab; /* light green button text */
+  --brand-soft-hover: #294736;
+
+  --danger-soft: #3a2422;
+  --danger-strong: #f0a8a4;
+  --danger-soft-hover: #472b29;
+
+  --pos: #82d6a0;
+  --neg: #f0a8a4;
+  --warn: #e6c684;
   color-scheme: dark;
 }
 
 @layer base {
-  /* Make bare border utilities (border-b, etc.) use the theme line color. */
+  /* Bare border utilities use the theme line color. */
   *,
   ::before,
   ::after {
@@ -43,19 +68,29 @@
   }
 }
 
-/* Reusable component classes (theme-aware) */
+/* Reusable component classes (theme-aware, pastel) */
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-brand text-white hover:bg-brand-dark;
+    @apply btn;
+    background-color: var(--brand-soft);
+    color: var(--brand-strong);
+  }
+  .btn-primary:hover {
+    background-color: var(--brand-soft-hover);
   }
   .btn-secondary {
     @apply btn border border-line bg-surface text-ink hover:bg-subtle;
   }
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700;
+    @apply btn;
+    background-color: var(--danger-soft);
+    color: var(--danger-strong);
+  }
+  .btn-danger:hover {
+    background-color: var(--danger-soft-hover);
   }
   .input {
     @apply w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand;

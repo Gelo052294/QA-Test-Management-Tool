@@ -192,7 +192,7 @@ function Row({ ex }: { ex: ExecRow }) {
               </a>
               <button
                 onClick={() => removeEvidence(f.id)}
-                className="text-xs text-red-500 hover:text-red-700"
+                className="text-xs text-neg hover:text-neg"
               >
                 remove
               </button>

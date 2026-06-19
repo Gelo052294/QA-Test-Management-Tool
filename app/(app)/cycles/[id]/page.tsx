@@ -57,9 +57,9 @@ export default async function CycleDetailPage({
   }));
 
   const stats = [
-    { label: "Passed", value: passed, color: "text-green-600" },
-    { label: "Failed", value: failed, color: "text-red-600" },
-    { label: "Blocked", value: blocked, color: "text-amber-600" },
+    { label: "Passed", value: passed, color: "text-pos" },
+    { label: "Failed", value: failed, color: "text-neg" },
+    { label: "Blocked", value: blocked, color: "text-warn" },
     { label: "Not run", value: notRun, color: "text-muted" },
   ];
 

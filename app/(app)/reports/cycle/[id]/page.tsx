@@ -17,9 +17,9 @@ export default async function CycleReportPage({
 
   const stats = [
     { label: "Total", value: report.total, color: "text-ink" },
-    { label: "Passed", value: report.counts.pass, color: "text-green-600" },
-    { label: "Failed", value: report.counts.fail, color: "text-red-600" },
-    { label: "Blocked", value: report.counts.blocked, color: "text-amber-600" },
+    { label: "Passed", value: report.counts.pass, color: "text-pos" },
+    { label: "Failed", value: report.counts.fail, color: "text-neg" },
+    { label: "Blocked", value: report.counts.blocked, color: "text-warn" },
     { label: "Not run", value: report.counts.not_run, color: "text-muted" },
     { label: "Pass rate", value: `${report.passRate}%`, color: "text-brand" },
   ];

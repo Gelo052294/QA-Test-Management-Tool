@@ -42,15 +42,15 @@ export default async function MonthlyReportPage({
           <div className="text-xs text-muted">Executed</div>
         </div>
         <div className="card text-center">
-          <div className="text-2xl font-bold text-green-600">{report.counts.pass}</div>
+          <div className="text-2xl font-bold text-pos">{report.counts.pass}</div>
           <div className="text-xs text-muted">Passed</div>
         </div>
         <div className="card text-center">
-          <div className="text-2xl font-bold text-red-600">{report.counts.fail}</div>
+          <div className="text-2xl font-bold text-neg">{report.counts.fail}</div>
           <div className="text-xs text-muted">Failed</div>
         </div>
         <div className="card text-center">
-          <div className="text-2xl font-bold text-amber-600">{report.counts.blocked}</div>
+          <div className="text-2xl font-bold text-warn">{report.counts.blocked}</div>
           <div className="text-xs text-muted">Blocked</div>
         </div>
         <div className="card text-center">

@@ -34,7 +34,7 @@ export default async function CyclesPage() {
                 <span
                   className={`rounded px-2 py-0.5 text-xs ${
                     c.status === "active"
-                      ? "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300"
+                      ? "bg-[#dcefe3] text-[#357d52] dark:bg-[#1d3328] dark:text-[#82d6a0]"
                       : "bg-subtle text-muted"
                   }`}
                 >
