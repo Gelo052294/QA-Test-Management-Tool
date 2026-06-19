@@ -150,6 +150,12 @@ curl -X POST "$BASE/api/executions/<executionId>/evidence" \
 
 ---
 
+## MCP server (record results from Claude)
+
+An MCP server in [`mcp/`](./mcp) lets Claude (Desktop or Code) record execution
+results and upload evidence into the tool using your API token. See
+[`mcp/README.md`](./mcp/README.md) for setup.
+
 ## Project structure
 
 ```
