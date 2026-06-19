@@ -143,7 +143,11 @@ export default async function CycleDetailPage({
         />
       </div>
 
-      <CycleExecutions executions={rows} />
+      <CycleExecutions
+        executions={rows}
+        backHref={`/cycles/${cycle.id}`}
+        backLabel={cycle.key ? `${cycle.key} ${cycle.name}` : cycle.name}
+      />
 
       <details className="card mt-6">
         <summary className="cursor-pointer font-semibold">

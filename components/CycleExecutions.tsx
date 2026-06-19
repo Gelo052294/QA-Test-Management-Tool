@@ -21,8 +21,12 @@ const STATUSES = ["not_run", "pass", "fail", "blocked"];
 
 export default function CycleExecutions({
   executions,
+  backHref,
+  backLabel,
 }: {
   executions: ExecRow[];
+  backHref?: string;
+  backLabel?: string;
 }) {
   if (executions.length === 0) {
     return (
@@ -34,13 +38,21 @@ export default function CycleExecutions({
   return (
     <div className="space-y-3">
       {executions.map((ex) => (
-        <Row key={ex.id} ex={ex} />
+        <Row key={ex.id} ex={ex} backHref={backHref} backLabel={backLabel} />
       ))}
     </div>
   );
 }
 
-function Row({ ex }: { ex: ExecRow }) {
+function Row({
+  ex,
+  backHref,
+  backLabel,
+}: {
+  ex: ExecRow;
+  backHref?: string;
+  backLabel?: string;
+}) {
   const router = useRouter();
   const [status, setStatus] = useState(ex.status);
   const [comment, setComment] = useState(ex.comment ?? "");
@@ -104,7 +116,11 @@ function Row({ ex }: { ex: ExecRow }) {
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
           <Link
-            href={`/test-cases/${ex.testCase.id}`}
+            href={
+              backHref
+                ? `/test-cases/${ex.testCase.id}?from=${encodeURIComponent(backHref)}&fromLabel=${encodeURIComponent(backLabel ?? "test cycle")}`
+                : `/test-cases/${ex.testCase.id}`
+            }
             className="font-medium hover:underline"
           >
             <span className="font-mono text-xs text-faint">

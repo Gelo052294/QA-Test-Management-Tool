@@ -11,10 +11,18 @@ type Step = { step: string; expectedResult: string };
 
 export default async function TestCaseDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string; fromLabel?: string }>;
 }) {
   const { id } = await params;
+  const { from, fromLabel } = await searchParams;
+  // Only honor internal cycle links to avoid open-redirect-style navigation.
+  const back =
+    from && from.startsWith("/cycles/")
+      ? { href: from, label: `← Back to ${fromLabel || "test cycle"}` }
+      : { href: "/test-cases", label: "← Back to test cases" };
   const tc = await prisma.testCase.findUnique({
     where: { id },
     include: {
@@ -43,8 +51,8 @@ export default async function TestCaseDetailPage({
     <div>
       <div className="mb-5 flex items-start justify-between">
         <div>
-          <Link href="/test-cases" className="text-sm text-muted hover:underline">
-            ← Back to test cases
+          <Link href={back.href} className="text-sm text-muted hover:underline">
+            {back.label}
           </Link>
           <h1 className="mt-1 text-xl font-bold">
             <span className="font-mono text-faint">{tc.key}</span> {tc.title}
