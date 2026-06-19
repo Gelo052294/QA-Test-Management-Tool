@@ -16,14 +16,14 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get("projectId")?.trim();
   const q = searchParams.get("q")?.trim();
-  const folder = searchParams.get("folder")?.trim();
+  const folderId = searchParams.get("folderId")?.trim();
   const jiraKey = searchParams.get("jiraKey")?.trim();
   const status = searchParams.get("status")?.trim();
 
   const testCases = await prisma.testCase.findMany({
     where: {
       ...(projectId ? { projectId } : {}),
-      ...(folder ? { folder } : {}),
+      ...(folderId ? { folderId } : {}),
       ...(jiraKey ? { jiraKey } : {}),
       ...(status ? { status: status as any } : {}),
       ...(q
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       steps: parsed.data.steps,
       priority: parsed.data.priority,
       status: parsed.data.status,
-      folder: parsed.data.folder,
+      folderId: parsed.data.folderId || null,
       jiraKey: parsed.data.jiraKey,
       createdById: user.id,
     },

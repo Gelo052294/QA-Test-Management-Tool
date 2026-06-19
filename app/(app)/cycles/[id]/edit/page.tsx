@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import CycleForm, { CycleFormValues } from "@/components/CycleForm";
+import { listFolders, buildTree, flattenForSelect } from "@/lib/folders";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,10 @@ export default async function EditCyclePage({
   const cycle = await prisma.testCycle.findUnique({ where: { id } });
   if (!cycle) notFound();
 
+  const folders = cycle.projectId
+    ? flattenForSelect(buildTree(await listFolders(cycle.projectId, "cycle")))
+    : [];
+
   const initial: CycleFormValues = {
     id: cycle.id,
     name: cycle.name,
@@ -26,6 +31,7 @@ export default async function EditCyclePage({
     status: cycle.status,
     startDate: toDateInput(cycle.startDate),
     endDate: toDateInput(cycle.endDate),
+    folderId: cycle.folderId ?? "",
   };
 
   return (
@@ -37,7 +43,7 @@ export default async function EditCyclePage({
         <h1 className="mt-1 text-xl font-bold">Edit cycle</h1>
       </div>
       <div className="card max-w-2xl">
-        <CycleForm initial={initial} />
+        <CycleForm initial={initial} folders={folders} />
       </div>
     </div>
   );

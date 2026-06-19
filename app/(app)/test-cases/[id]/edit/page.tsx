@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import TestCaseForm, { TestCaseFormValues } from "@/components/TestCaseForm";
+import { listFolders, buildTree, flattenForSelect } from "@/lib/folders";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,10 @@ export default async function EditTestCasePage({
   const tc = await prisma.testCase.findUnique({ where: { id } });
   if (!tc) notFound();
 
+  const folders = tc.projectId
+    ? flattenForSelect(buildTree(await listFolders(tc.projectId, "testcase")))
+    : [];
+
   const initial: TestCaseFormValues = {
     id: tc.id,
     title: tc.title,
@@ -27,7 +32,7 @@ export default async function EditTestCasePage({
         : [{ step: "", expectedResult: "" }],
     priority: tc.priority,
     status: tc.status,
-    folder: tc.folder ?? "",
+    folderId: tc.folderId ?? "",
     jiraKey: tc.jiraKey ?? "",
   };
 
@@ -42,7 +47,7 @@ export default async function EditTestCasePage({
         </h1>
       </div>
       <div className="card">
-        <TestCaseForm initial={initial} />
+        <TestCaseForm initial={initial} folders={folders} />
       </div>
     </div>
   );

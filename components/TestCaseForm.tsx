@@ -13,7 +13,7 @@ export type TestCaseFormValues = {
   steps: Step[];
   priority: string;
   status: string;
-  folder: string;
+  folderId: string;
   jiraKey: string;
 };
 
@@ -24,20 +24,26 @@ const empty: TestCaseFormValues = {
   steps: [{ step: "", expectedResult: "" }],
   priority: "medium",
   status: "active",
-  folder: "",
+  folderId: "",
   jiraKey: "",
 };
 
 export default function TestCaseForm({
   initial,
   projectId,
+  folders = [],
+  defaultFolderId,
 }: {
   initial?: TestCaseFormValues;
   projectId?: string;
+  folders?: { id: string; label: string }[];
+  defaultFolderId?: string;
 }) {
   const router = useRouter();
   const isEdit = Boolean(initial?.id);
-  const [values, setValues] = useState<TestCaseFormValues>(initial ?? empty);
+  const [values, setValues] = useState<TestCaseFormValues>(
+    initial ?? { ...empty, folderId: defaultFolderId ?? "" }
+  );
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -65,7 +71,7 @@ export default function TestCaseForm({
       ...values,
       steps: values.steps.filter((s) => s.step.trim() !== ""),
       jiraKey: values.jiraKey.trim() || undefined,
-      folder: values.folder.trim() || undefined,
+      folderId: values.folderId || null,
       ...(isEdit ? {} : { projectId }),
     };
 
@@ -132,12 +138,18 @@ export default function TestCaseForm({
         </div>
         <div>
           <label className="label">Folder</label>
-          <input
+          <select
             className="input"
-            value={values.folder}
-            placeholder="e.g. Authentication"
-            onChange={(e) => set("folder", e.target.value)}
-          />
+            value={values.folderId}
+            onChange={(e) => set("folderId", e.target.value)}
+          >
+            <option value="">— No folder —</option>
+            {folders.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.label}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="label">Jira key</label>

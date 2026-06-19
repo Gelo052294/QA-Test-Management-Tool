@@ -19,6 +19,7 @@ export default async function TestCaseDetailPage({
     where: { id },
     include: {
       createdBy: { select: { name: true, email: true } },
+      folderRef: { select: { name: true } },
       executions: {
         include: { cycle: { select: { id: true, name: true } } },
         orderBy: { createdAt: "desc" },
@@ -136,7 +137,7 @@ export default async function TestCaseDetailPage({
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Folder</dt>
-                <dd>{tc.folder || "—"}</dd>
+                <dd>{tc.folderRef?.name ?? "—"}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Jira</dt>

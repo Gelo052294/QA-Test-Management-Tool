@@ -28,6 +28,17 @@ export const projectUpdateSchema = z.object({
   description: z.string().optional(),
 });
 
+export const folderCreateSchema = z.object({
+  projectId: z.string().min(1),
+  kind: z.enum(["testcase", "cycle"]),
+  name: z.string().trim().min(1, "Folder name is required").max(80),
+  parentId: z.string().optional(),
+});
+
+export const folderUpdateSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+});
+
 export const testCaseCreateSchema = z.object({
   projectId: z.string().min(1, "Project is required"),
   title: z.string().min(1, "Title is required"),
@@ -36,7 +47,7 @@ export const testCaseCreateSchema = z.object({
   steps: z.array(step).default([]),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   status: z.enum(["draft", "active", "deprecated"]).default("active"),
-  folder: z.string().optional(),
+  folderId: z.string().nullable().optional(),
   jiraKey,
 });
 
@@ -50,6 +61,11 @@ export const cycleCreateSchema = z.object({
   status: z.enum(["active", "completed"]).default("active"),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
+  folderId: z.string().nullable().optional(),
+});
+
+export const cycleDuplicateSchema = z.object({
+  name: z.string().trim().min(1, "A new name is required"),
 });
 
 export const cycleUpdateSchema = cycleCreateSchema.omit({ projectId: true }).partial();

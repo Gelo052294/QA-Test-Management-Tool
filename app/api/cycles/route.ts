@@ -55,6 +55,7 @@ export async function POST(req: Request) {
       status: parsed.data.status,
       startDate: parsed.data.startDate,
       endDate: parsed.data.endDate,
+      folderId: parsed.data.folderId || null,
       createdById: user.id,
     },
   });

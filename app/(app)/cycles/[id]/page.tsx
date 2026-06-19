@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import CycleExecutions from "@/components/CycleExecutions";
 import AddTestCases from "@/components/AddTestCases";
 import DeleteButton from "@/components/DeleteButton";
+import DuplicateCycleButton from "@/components/DuplicateCycleButton";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +80,7 @@ export default async function CycleDetailPage({
           <a href={`/api/cycles/${cycle.id}/export`} className="btn-secondary">
             Export Excel
           </a>
+          <DuplicateCycleButton cycleId={cycle.id} currentName={cycle.name} />
           <Link href={`/reports/cycle/${cycle.id}`} className="btn-secondary">
             View report
           </Link>

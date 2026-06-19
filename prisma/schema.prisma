@@ -40,6 +40,11 @@ enum ExecutionStatus {
   blocked
 }
 
+enum FolderKind {
+  testcase
+  cycle
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -69,6 +74,25 @@ model Project {
 
   testCases TestCase[]
   cycles    TestCycle[]
+  folders   Folder[]
+}
+
+model Folder {
+  id        String     @id @default(cuid())
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  kind      FolderKind
+  name      String
+  parentId  String?
+  parent    Folder?    @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[]   @relation("FolderTree")
+  createdAt DateTime   @default(now())
+
+  testCases TestCase[]
+  cycles    TestCycle[]
+
+  @@index([projectId, kind])
+  @@index([parentId])
 }
 
 model TestCase {
@@ -81,7 +105,9 @@ model TestCase {
   steps         Json             @default("[]") // [{ step, expectedResult }]
   priority      TestCasePriority @default(medium)
   status        TestCaseStatus   @default(active)
-  folder        String?
+  folder        String? // legacy free-text label (superseded by folderId)
+  folderId      String?
+  folderRef     Folder?          @relation(fields: [folderId], references: [id], onDelete: SetNull)
   jiraKey       String? // e.g. PROJ-123 (link-only)
   projectId     String? // made required after data migration
   project       Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -93,8 +119,8 @@ model TestCase {
   executions TestExecution[]
 
   @@index([projectId])
+  @@index([folderId])
   @@index([jiraKey])
-  @@index([folder])
 }
 
 model TestCycle {
@@ -107,6 +133,8 @@ model TestCycle {
   endDate     DateTime?
   projectId   String? // made required after data migration
   project     Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  folderId    String?
+  folderRef   Folder?     @relation(fields: [folderId], references: [id], onDelete: SetNull)
   createdById String
   createdBy   User        @relation("CycleCreatedBy", fields: [createdById], references: [id])
   createdAt   DateTime    @default(now())
@@ -114,6 +142,7 @@ model TestCycle {
   executions TestExecution[]
 
   @@index([projectId])
+  @@index([folderId])
 }
 
 model TestExecution {

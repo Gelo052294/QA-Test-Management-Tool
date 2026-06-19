@@ -10,6 +10,7 @@ export type CycleFormValues = {
   status: string;
   startDate: string;
   endDate: string;
+  folderId: string;
 };
 
 const empty: CycleFormValues = {
@@ -18,18 +19,25 @@ const empty: CycleFormValues = {
   status: "active",
   startDate: "",
   endDate: "",
+  folderId: "",
 };
 
 export default function CycleForm({
   initial,
   projectId,
+  folders = [],
+  defaultFolderId,
 }: {
   initial?: CycleFormValues;
   projectId?: string;
+  folders?: { id: string; label: string }[];
+  defaultFolderId?: string;
 }) {
   const router = useRouter();
   const isEdit = Boolean(initial?.id);
-  const [values, setValues] = useState<CycleFormValues>(initial ?? empty);
+  const [values, setValues] = useState<CycleFormValues>(
+    initial ?? { ...empty, folderId: defaultFolderId ?? "" }
+  );
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -48,6 +56,7 @@ export default function CycleForm({
       status: values.status,
       startDate: values.startDate || undefined,
       endDate: values.endDate || undefined,
+      folderId: values.folderId || null,
       ...(isEdit ? {} : { projectId }),
     };
 
@@ -121,6 +130,22 @@ export default function CycleForm({
             onChange={(e) => set("endDate", e.target.value)}
           />
         </div>
+      </div>
+
+      <div className="sm:max-w-xs">
+        <label className="label">Folder</label>
+        <select
+          className="input"
+          value={values.folderId}
+          onChange={(e) => set("folderId", e.target.value)}
+        >
+          <option value="">— No folder —</option>
+          {folders.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {error && <p className="text-sm text-neg">{error}</p>}
