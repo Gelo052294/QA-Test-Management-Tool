@@ -72,6 +72,19 @@ async function resolveExecution(cycleKey, testCaseKey) {
   return { cycle, exec };
 }
 
+async function resolveTestCaseIds(projectId, keys) {
+  const { testCases } = await api(`/api/test-cases?projectId=${projectId}`);
+  const byKey = new Map(testCases.map((t) => [t.key.toLowerCase(), t.id]));
+  const ids = [];
+  const missing = [];
+  for (const k of keys) {
+    const id = byKey.get(k.toLowerCase());
+    if (id) ids.push(id);
+    else missing.push(k);
+  }
+  return { ids, missing };
+}
+
 const ok = (text) => ({ content: [{ type: "text", text }] });
 const fail = (text) => ({ content: [{ type: "text", text }], isError: true });
 
@@ -180,6 +193,190 @@ server.tool(
         throw new Error(`Upload failed: HTTP ${res.status} ${t}`);
       }
       return ok(`Uploaded ${basename(filePath)} to ${testCaseKey} in ${cycleKey}.`);
+    } catch (e) {
+      return fail(String(e.message || e));
+    }
+  }
+);
+
+server.tool(
+  "qa_create_test_case",
+  "Create a test case in a project.",
+  {
+    projectKey: z.string().describe("e.g. AUR"),
+    title: z.string(),
+    priority: z.enum(["low", "medium", "high", "critical"]).optional(),
+    status: z.enum(["draft", "active", "deprecated"]).optional(),
+    description: z.string().optional(),
+    preconditions: z.string().optional(),
+    jiraKey: z.string().optional().describe("e.g. PROJ-123"),
+    steps: z
+      .array(z.object({ step: z.string(), expectedResult: z.string().optional() }))
+      .optional()
+      .describe("Ordered steps with expected results"),
+  },
+  async (a) => {
+    try {
+      const projectId = await resolveProjectId(a.projectKey);
+      const { testCase } = await api("/api/test-cases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId,
+          title: a.title,
+          priority: a.priority,
+          status: a.status,
+          description: a.description,
+          preconditions: a.preconditions,
+          jiraKey: a.jiraKey,
+          steps: a.steps ?? [],
+        }),
+      });
+      return ok(`Created ${testCase.key}: ${testCase.title}`);
+    } catch (e) {
+      return fail(String(e.message || e));
+    }
+  }
+);
+
+server.tool(
+  "qa_create_cycle",
+  "Create a test cycle in a project. Start and end dates are required (YYYY-MM-DD).",
+  {
+    projectKey: z.string().describe("e.g. AUR"),
+    name: z.string(),
+    startDate: z.string().describe("YYYY-MM-DD"),
+    endDate: z.string().describe("YYYY-MM-DD"),
+    description: z.string().optional(),
+  },
+  async (a) => {
+    try {
+      const projectId = await resolveProjectId(a.projectKey);
+      const { cycle } = await api("/api/cycles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId,
+          name: a.name,
+          startDate: a.startDate,
+          endDate: a.endDate,
+          description: a.description,
+        }),
+      });
+      return ok(`Created cycle ${cycle.key}: ${cycle.name}`);
+    } catch (e) {
+      return fail(String(e.message || e));
+    }
+  }
+);
+
+server.tool(
+  "qa_add_tests_to_cycle",
+  "Add test cases (by key) to a cycle.",
+  {
+    cycleKey: z.string().describe("e.g. AUR-C1"),
+    testCaseKeys: z.array(z.string()).describe("e.g. ['AUR-T1','AUR-T2']"),
+  },
+  async ({ cycleKey, testCaseKeys }) => {
+    try {
+      const cycle = await resolveCycle(cycleKey);
+      const { ids, missing } = await resolveTestCaseIds(cycle.projectId, testCaseKeys);
+      if (ids.length === 0) return fail(`No matching test cases found: ${missing.join(", ")}`);
+      const res = await api(`/api/cycles/${cycle.id}/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ testCaseIds: ids }),
+      });
+      let msg = `Added ${res.added} test case(s) to ${cycleKey}.`;
+      if (missing.length) msg += ` Not found: ${missing.join(", ")}.`;
+      return ok(msg);
+    } catch (e) {
+      return fail(String(e.message || e));
+    }
+  }
+);
+
+server.tool(
+  "qa_report_cycle_summary",
+  "Get the pass/fail summary for a cycle.",
+  { cycleKey: z.string().describe("e.g. AUR-C1") },
+  async ({ cycleKey }) => {
+    try {
+      const cycle = await resolveCycle(cycleKey);
+      const r = await api(`/api/reports/cycle-summary?cycleId=${cycle.id}`);
+      return ok(
+        `${cycle.key} — ${r.cycle.name}\n` +
+          `Total ${r.total} · Pass ${r.counts.pass} · Fail ${r.counts.fail} · ` +
+          `Blocked ${r.counts.blocked} · Not run ${r.counts.not_run}\n` +
+          `Pass rate ${r.passRate}% · Executed ${r.progress}%`
+      );
+    } catch (e) {
+      return fail(String(e.message || e));
+    }
+  }
+);
+
+server.tool(
+  "qa_report_monthly",
+  "Monthly execution report for a given month (YYYY-MM), optionally by project.",
+  {
+    month: z.string().describe("YYYY-MM"),
+    projectKey: z.string().optional(),
+  },
+  async ({ month, projectKey }) => {
+    try {
+      let q = `month=${encodeURIComponent(month)}`;
+      if (projectKey) q += `&projectId=${encodeURIComponent(await resolveProjectId(projectKey))}`;
+      const r = await api(`/api/reports/monthly?${q}`);
+      const byTester = r.byTester
+        .map((t) => `  ${t.name}: ${t.pass}P/${t.fail}F/${t.blocked}B (${t.passRate}%)`)
+        .join("\n");
+      return ok(
+        `${month}: ${r.totalExecuted} executed · pass rate ${r.passRate}%\n` +
+          (byTester || "  (no executions)")
+      );
+    } catch (e) {
+      return fail(String(e.message || e));
+    }
+  }
+);
+
+server.tool(
+  "qa_report_testers",
+  "Per-tester activity (cases created, executions, pass rate), optionally by project.",
+  { projectKey: z.string().optional() },
+  async ({ projectKey }) => {
+    try {
+      let path = "/api/reports/testers";
+      if (projectKey) path += `?projectId=${encodeURIComponent(await resolveProjectId(projectKey))}`;
+      const r = await api(path);
+      const lines = r.testers.map(
+        (t) =>
+          `${t.name}: created ${t.testCasesCreated}, ran ${t.executionsRun} ` +
+          `(${t.pass}P/${t.fail}F/${t.blocked}B, ${t.passRate}%)`
+      );
+      return ok(lines.join("\n") || "No testers.");
+    } catch (e) {
+      return fail(String(e.message || e));
+    }
+  }
+);
+
+server.tool(
+  "qa_report_jira_coverage",
+  "Jira coverage: linked test cases per ticket and their latest result, optionally by project.",
+  { projectKey: z.string().optional() },
+  async ({ projectKey }) => {
+    try {
+      let path = "/api/reports/jira-coverage";
+      if (projectKey) path += `?projectId=${encodeURIComponent(await resolveProjectId(projectKey))}`;
+      const r = await api(path);
+      const lines = r.coverage.map(
+        (g) =>
+          `${g.jiraKey} (${g.linkedCount}): ` +
+          g.testCases.map((t) => `${t.key}=${t.latestStatus}`).join(", ")
+      );
+      return ok(lines.join("\n") || "No test cases linked to Jira.");
     } catch (e) {
       return fail(String(e.message || e));
     }

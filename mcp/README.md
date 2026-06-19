@@ -13,6 +13,13 @@ QA Test Management Tool. It talks to the app's REST API using a personal API tok
 | `qa_list_cycle_tests` | List a cycle's test cases + current result (`cycleKey`). |
 | `qa_set_result` | Record a result: `cycleKey`, `testCaseKey`, `status` (`not_run`/`pass`/`fail`/`blocked`), optional `comment`, `defectJiraKey`. |
 | `qa_upload_evidence` | Upload a file to an execution: `cycleKey`, `testCaseKey`, `filePath`. |
+| `qa_create_test_case` | Create a test case: `projectKey`, `title`, optional `priority`/`status`/`description`/`preconditions`/`jiraKey`/`steps`. |
+| `qa_create_cycle` | Create a cycle: `projectKey`, `name`, `startDate`, `endDate` (YYYY-MM-DD), optional `description`. |
+| `qa_add_tests_to_cycle` | Add test cases to a cycle: `cycleKey`, `testCaseKeys[]`. |
+| `qa_report_cycle_summary` | Pass/fail summary for a cycle (`cycleKey`). |
+| `qa_report_monthly` | Monthly execution report (`month` YYYY-MM, optional `projectKey`). |
+| `qa_report_testers` | Per-tester activity (optional `projectKey`). |
+| `qa_report_jira_coverage` | Jira coverage (optional `projectKey`). |
 
 ## Setup
 
