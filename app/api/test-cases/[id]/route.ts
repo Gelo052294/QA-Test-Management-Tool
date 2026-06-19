@@ -7,6 +7,7 @@ import {
   notFound,
 } from "@/lib/apiAuth";
 import { testCaseUpdateSchema } from "@/lib/validation";
+import { recordTestCaseHistory, stepsToText, HistoryEntry } from "@/lib/history";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -40,13 +41,39 @@ export async function PATCH(req: Request, { params }: Params) {
     return badRequest("Invalid input", parsed.error.flatten().fieldErrors);
   }
 
-  const existing = await prisma.testCase.findUnique({ where: { id } });
+  const existing = await prisma.testCase.findUnique({
+    where: { id },
+    include: { folderRef: { select: { name: true } } },
+  });
   if (!existing) return notFound("Test case not found");
 
-  const testCase = await prisma.testCase.update({
-    where: { id },
-    data: parsed.data,
-  });
+  const d = parsed.data;
+  const testCase = await prisma.testCase.update({ where: { id }, data: d });
+
+  // Resolve the new folder name if the folder changed.
+  let newFolderName = existing.folderRef?.name ?? "-";
+  if (d.folderId !== undefined && d.folderId !== existing.folderId) {
+    newFolderName = d.folderId
+      ? (await prisma.folder.findUnique({ where: { id: d.folderId } }))?.name ?? "-"
+      : "-";
+  }
+
+  const entries: HistoryEntry[] = [];
+  if (d.title !== undefined) entries.push({ field: "Title", oldValue: existing.title, newValue: testCase.title });
+  if (d.description !== undefined)
+    entries.push({ field: "Description", oldValue: existing.description ?? "-", newValue: testCase.description ?? "-" });
+  if (d.preconditions !== undefined)
+    entries.push({ field: "Preconditions", oldValue: existing.preconditions ?? "-", newValue: testCase.preconditions ?? "-" });
+  if (d.priority !== undefined) entries.push({ field: "Priority", oldValue: existing.priority, newValue: testCase.priority });
+  if (d.status !== undefined) entries.push({ field: "Status", oldValue: existing.status, newValue: testCase.status });
+  if (d.jiraKey !== undefined)
+    entries.push({ field: "Jira Key", oldValue: existing.jiraKey ?? "-", newValue: testCase.jiraKey ?? "-" });
+  if (d.folderId !== undefined)
+    entries.push({ field: "Folder", oldValue: existing.folderRef?.name ?? "-", newValue: newFolderName });
+  if (d.steps !== undefined)
+    entries.push({ field: "Steps", oldValue: stepsToText(existing.steps), newValue: stepsToText(testCase.steps) });
+
+  await recordTestCaseHistory(id, user.id, entries);
   return json({ testCase });
 }
 

@@ -21,8 +21,16 @@ export default async function TestCaseDetailPage({
       createdBy: { select: { name: true, email: true } },
       folderRef: { select: { name: true } },
       executions: {
-        include: { cycle: { select: { id: true, name: true } } },
+        include: {
+          cycle: { select: { id: true, name: true, key: true } },
+          executedBy: { select: { name: true } },
+        },
         orderBy: { createdAt: "desc" },
+      },
+      history: {
+        include: { changedBy: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 300,
       },
     },
   });
@@ -100,23 +108,88 @@ export default async function TestCaseDetailPage({
             )}
           </div>
 
-          <div className="card">
-            <h2 className="mb-3 font-semibold">In test cycles</h2>
+          <div className="card overflow-x-auto">
+            <h2 className="mb-3 font-semibold">Execution history</h2>
             {tc.executions.length === 0 ? (
               <p className="text-sm text-muted">Not part of any cycle yet.</p>
             ) : (
-              <ul className="space-y-2 text-sm">
-                {tc.executions.map((ex) => (
-                  <li key={ex.id} className="flex items-center justify-between">
-                    <Link href={`/cycles/${ex.cycle.id}`} className="text-brand hover:underline">
-                      {ex.cycle.name}
-                    </Link>
-                    <ExecutionStatusBadge value={ex.status} />
-                  </li>
-                ))}
-              </ul>
+              <table className="w-full text-sm">
+                <thead className="border-b border-line text-left text-xs uppercase text-muted">
+                  <tr>
+                    <th className="py-2 pr-4">Test Cycle</th>
+                    <th className="py-2 pr-4">Status</th>
+                    <th className="py-2 pr-4">Executed at</th>
+                    <th className="py-2 pr-4">Executed by</th>
+                    <th className="py-2">Defect</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {tc.executions.map((ex) => (
+                    <tr key={ex.id} className="align-top">
+                      <td className="py-2 pr-4">
+                        <Link href={`/cycles/${ex.cycle.id}`} className="text-brand hover:underline">
+                          {ex.cycle.key ? <span className="font-mono text-xs">{ex.cycle.key} </span> : null}
+                          {ex.cycle.name}
+                        </Link>
+                      </td>
+                      <td className="py-2 pr-4">
+                        <ExecutionStatusBadge value={ex.status} />
+                      </td>
+                      <td className="py-2 pr-4 whitespace-nowrap text-muted">
+                        {ex.executedAt ? new Date(ex.executedAt).toLocaleString() : "—"}
+                      </td>
+                      <td className="py-2 pr-4">{ex.executedBy?.name ?? "—"}</td>
+                      <td className="py-2">
+                        <JiraLink jiraKey={ex.defectJiraKey} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
+
+          <details className="card">
+            <summary className="cursor-pointer font-semibold">
+              Change history ({tc.history.length})
+            </summary>
+            <div className="mt-3 overflow-x-auto">
+              {tc.history.length === 0 ? (
+                <p className="text-sm text-muted">No changes recorded yet.</p>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="border-b border-line text-left text-xs uppercase text-muted">
+                    <tr>
+                      <th className="py-2 pr-4">Changed By</th>
+                      <th className="py-2 pr-4">Date</th>
+                      <th className="py-2 pr-4">Field</th>
+                      <th className="py-2 pr-4">Original Value</th>
+                      <th className="py-2">New Value</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line">
+                    {tc.history.map((h) => (
+                      <tr key={h.id} className="align-top">
+                        <td className="py-2 pr-4 whitespace-nowrap">{h.changedBy.name}</td>
+                        <td className="py-2 pr-4 whitespace-nowrap text-muted">
+                          {h.createdAt.toLocaleString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </td>
+                        <td className="py-2 pr-4 whitespace-nowrap">{h.field}</td>
+                        <td className="py-2 pr-4 break-words text-muted">{h.oldValue ?? "-"}</td>
+                        <td className="py-2 break-words">{h.newValue ?? "-"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </details>
         </div>
 
         <div className="space-y-5">
