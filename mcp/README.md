@@ -21,7 +21,37 @@ QA Test Management Tool. It talks to the app's REST API using a personal API tok
 | `qa_report_testers` | Per-tester activity (optional `projectKey`). |
 | `qa_report_jira_coverage` | Jira coverage (optional `projectKey`). |
 
-## Setup
+## Two ways to run it
+
+- **Remote (hosted, recommended for teams)** — the app exposes an HTTP MCP endpoint at
+  `/api/mcp`. Teammates connect by **URL + their own API token**; nothing is installed
+  locally. See "Remote setup" below.
+- **Local (stdio)** — run `server.mjs` on your machine. See "Local setup" below.
+
+Both expose the same tools and authenticate with a personal API token (Settings → API token),
+so actions are attributed to that user and logged in history.
+
+## Remote setup (hosted `/api/mcp`)
+
+No install. Each teammate gets their own token (Settings → API token), then:
+
+**Claude Code**
+```bash
+claude mcp add --transport http qa-tms \
+  https://your-app.vercel.app/api/mcp \
+  --header "Authorization: Bearer qatms_xxxxxxxx"
+```
+
+That's it — their Claude discovers the tools and calls them over HTTPS; every request
+carries their token, so results are attributed to them.
+
+Notes:
+- Evidence upload remotely uses `qa_upload_evidence` with **base64 file content** (the agent
+  reads the file and sends the bytes) — the server can't read a teammate's local disk.
+- This endpoint uses header-token auth (great with Claude Code). A one-click OAuth "Connect"
+  flow (for claude.ai/Desktop connectors) can be added later.
+
+## Local setup (stdio)
 
 1. **Install deps** (once):
    ```bash

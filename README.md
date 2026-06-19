@@ -152,9 +152,13 @@ curl -X POST "$BASE/api/executions/<executionId>/evidence" \
 
 ## MCP server (record results from Claude)
 
-An MCP server in [`mcp/`](./mcp) lets Claude (Desktop or Code) record execution
-results and upload evidence into the tool using your API token. See
-[`mcp/README.md`](./mcp/README.md) for setup.
+Claude can record execution results, upload evidence, create cases/cycles, and read
+reports using your API token. Two options:
+- **Remote (hosted):** the app serves an MCP endpoint at `/api/mcp` — teammates connect by
+  URL + their own token, no install.
+- **Local (stdio):** run [`mcp/server.mjs`](./mcp).
+
+See [`mcp/README.md`](./mcp/README.md) for setup.
 
 ## Project structure
 
