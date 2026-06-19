@@ -9,7 +9,7 @@ import FolderTree from "@/components/FolderTree";
 import MoveToFolder from "@/components/MoveToFolder";
 import EmptyProject from "@/components/EmptyProject";
 import { getCurrentProject } from "@/lib/project";
-import { listFolders, buildTree, flattenForSelect } from "@/lib/folders";
+import { listFolders, buildTree, flattenForSelect, collectFolderIds } from "@/lib/folders";
 import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -24,26 +24,26 @@ export default async function TestCasesPage({
   if (!project) return <EmptyProject isAdmin={user.role === "admin"} />;
 
   const { q, folderId } = await searchParams;
-  const [folders, testCases] = await Promise.all([
-    listFolders(project.id, "testcase"),
-    prisma.testCase.findMany({
-      where: {
-        projectId: project.id,
-        ...(folderId ? { folderId } : {}),
-        ...(q
-          ? {
-              OR: [
-                { title: { contains: q, mode: "insensitive" } },
-                { key: { contains: q, mode: "insensitive" } },
-                { jiraKey: { contains: q, mode: "insensitive" } },
-              ] as Prisma.TestCaseWhereInput["OR"],
-            }
-          : {}),
-      },
-      orderBy: { seq: "desc" },
-      include: { createdBy: { select: { name: true } }, folderRef: { select: { name: true } } },
-    }),
-  ]);
+  const folders = await listFolders(project.id, "testcase");
+  const folderIds = folderId ? collectFolderIds(folders, folderId) : null;
+
+  const testCases = await prisma.testCase.findMany({
+    where: {
+      projectId: project.id,
+      ...(folderIds ? { folderId: { in: folderIds } } : {}),
+      ...(q
+        ? {
+            OR: [
+              { title: { contains: q, mode: "insensitive" } },
+              { key: { contains: q, mode: "insensitive" } },
+              { jiraKey: { contains: q, mode: "insensitive" } },
+            ] as Prisma.TestCaseWhereInput["OR"],
+          }
+        : {}),
+    },
+    orderBy: { seq: "desc" },
+    include: { createdBy: { select: { name: true } }, folderRef: { select: { name: true } } },
+  });
 
   const folderOptions = flattenForSelect(buildTree(folders));
   const newHref = folderId ? `/test-cases/new?folderId=${folderId}` : "/test-cases/new";

@@ -4,7 +4,7 @@ import EmptyProject from "@/components/EmptyProject";
 import FolderTree from "@/components/FolderTree";
 import CycleCard from "@/components/CycleCard";
 import { getCurrentProject } from "@/lib/project";
-import { listFolders } from "@/lib/folders";
+import { listFolders, collectFolderIds } from "@/lib/folders";
 import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -19,17 +19,17 @@ export default async function CyclesPage({
   if (!project) return <EmptyProject isAdmin={user.role === "admin"} />;
 
   const { folderId } = await searchParams;
-  const [folders, cycles] = await Promise.all([
-    listFolders(project.id, "cycle"),
-    prisma.testCycle.findMany({
-      where: { projectId: project.id, ...(folderId ? { folderId } : {}) },
-      orderBy: { createdAt: "desc" },
-      include: {
-        createdBy: { select: { name: true } },
-        executions: { select: { status: true } },
-      },
-    }),
-  ]);
+  const folders = await listFolders(project.id, "cycle");
+  const folderIds = folderId ? collectFolderIds(folders, folderId) : null;
+
+  const cycles = await prisma.testCycle.findMany({
+    where: { projectId: project.id, ...(folderIds ? { folderId: { in: folderIds } } : {}) },
+    orderBy: { createdAt: "desc" },
+    include: {
+      createdBy: { select: { name: true } },
+      executions: { select: { status: true } },
+    },
+  });
 
   const newHref = folderId ? `/cycles/new?folderId=${folderId}` : "/cycles/new";
 

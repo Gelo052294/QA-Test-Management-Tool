@@ -28,6 +28,30 @@ export async function listFolders(
   }));
 }
 
+/**
+ * Collect a folder id together with all of its descendant folder ids.
+ * Used so selecting a folder filters items in it AND every subfolder beneath it.
+ */
+export function collectFolderIds(
+  flat: { id: string; parentId: string | null }[],
+  rootId: string
+): string[] {
+  const childrenByParent = new Map<string | null, string[]>();
+  for (const f of flat) {
+    const arr = childrenByParent.get(f.parentId) ?? [];
+    arr.push(f.id);
+    childrenByParent.set(f.parentId, arr);
+  }
+  const out: string[] = [];
+  const stack = [rootId];
+  while (stack.length) {
+    const id = stack.pop()!;
+    out.push(id);
+    for (const child of childrenByParent.get(id) ?? []) stack.push(child);
+  }
+  return out;
+}
+
 /** Build a nested tree from a flat folder list. */
 export function buildTree(flat: FlatFolder[]): FolderNode[] {
   const byId = new Map<string, FolderNode>();
