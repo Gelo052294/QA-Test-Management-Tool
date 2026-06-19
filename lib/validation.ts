@@ -32,7 +32,7 @@ export const folderCreateSchema = z.object({
   projectId: z.string().min(1),
   kind: z.enum(["testcase", "cycle"]),
   name: z.string().trim().min(1, "Folder name is required").max(80),
-  parentId: z.string().optional(),
+  parentId: z.string().nullish(), // accepts string | null | undefined
 });
 
 export const folderUpdateSchema = z.object({

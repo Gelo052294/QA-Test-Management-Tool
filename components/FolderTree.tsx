@@ -43,12 +43,17 @@ export default function FolderTree({
     const name = window.prompt(parentId ? "New subfolder name:" : "New folder name:");
     if (!name || !name.trim()) return;
     setBusy(true);
-    await fetch("/api/folders", {
+    const res = await fetch("/api/folders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ projectId, kind, name: name.trim(), parentId }),
+      body: JSON.stringify({ projectId, kind, name: name.trim(), parentId: parentId ?? undefined }),
     });
     setBusy(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || "Could not create the folder.");
+      return;
+    }
     router.refresh();
   }
 
