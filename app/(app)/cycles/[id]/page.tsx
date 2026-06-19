@@ -76,6 +76,9 @@ export default async function CycleDetailPage({
           )}
         </div>
         <div className="flex gap-2">
+          <a href={`/api/cycles/${cycle.id}/export`} className="btn-secondary">
+            Export Excel
+          </a>
           <Link href={`/reports/cycle/${cycle.id}`} className="btn-secondary">
             View report
           </Link>

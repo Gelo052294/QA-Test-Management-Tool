@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { PriorityBadge, TestCaseStatusBadge } from "@/components/Badges";
 import JiraLink from "@/components/JiraLink";
 import SearchBox from "@/components/SearchBox";
+import TestCaseImportExport from "@/components/TestCaseImportExport";
 import EmptyProject from "@/components/EmptyProject";
 import { getCurrentProject } from "@/lib/project";
 import { requireUser } from "@/lib/session";
@@ -46,9 +47,12 @@ export default async function TestCasesPage({
         <h1 className="text-xl font-bold">
           Test Cases <span className="text-sm font-normal text-muted">· {project.key}</span>
         </h1>
-        <Link href="/test-cases/new" className="btn-primary">
-          + New test case
-        </Link>
+        <div className="flex items-center gap-2">
+          <TestCaseImportExport projectId={project.id} />
+          <Link href="/test-cases/new" className="btn-primary">
+            + New test case
+          </Link>
+        </div>
       </div>
 
       <div className="mb-4">

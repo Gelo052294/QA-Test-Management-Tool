@@ -68,6 +68,40 @@
   }
 }
 
+/* ---- Print / Save-as-PDF: force a clean light layout ---- */
+@media print {
+  /* Force light colors even when viewing in dark mode. */
+  :root,
+  .dark {
+    --app: #ffffff;
+    --surface: #ffffff;
+    --subtle: #f2f3f5;
+    --line: #cbd1d8;
+    --ink: #111827;
+    --muted: #374151;
+    --faint: #6b7280;
+  }
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  table {
+    break-inside: auto;
+  }
+  tr {
+    break-inside: avoid;
+  }
+  @page {
+    margin: 1.5cm;
+  }
+}
+
 /* Reusable component classes (theme-aware, pastel) */
 @layer components {
   .btn {

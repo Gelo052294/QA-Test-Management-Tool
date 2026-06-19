@@ -2,6 +2,7 @@ import Link from "next/link";
 import { monthlyReport } from "@/lib/reports";
 import { ExecutionStatusBadge } from "@/components/Badges";
 import MonthPicker from "@/components/MonthPicker";
+import PrintButton from "@/components/PrintButton";
 import EmptyProject from "@/components/EmptyProject";
 import { getCurrentProject } from "@/lib/project";
 import { requireUser } from "@/lib/session";
@@ -33,13 +34,17 @@ export default async function MonthlyReportPage({
           <Link href="/reports" className="text-sm text-muted hover:underline">
             ← Reports
           </Link>
-          <h1 className="mt-1 text-xl font-bold">Monthly execution report</h1>
+          <h1 className="mt-1 text-xl font-bold">
+            Monthly execution report{" "}
+            <span className="text-sm font-normal text-muted">· {project.key} · {month}</span>
+          </h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 no-print">
           <MonthPicker month={month} />
           <a href={`/api/reports/monthly?month=${month}&projectId=${project.id}&format=csv`} className="btn-secondary">
             Export CSV
           </a>
+          <PrintButton />
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { cycleSummary } from "@/lib/reports";
 import { ExecutionStatusBadge } from "@/components/Badges";
 import JiraLink from "@/components/JiraLink";
+import PrintButton from "@/components/PrintButton";
 
 export const dynamic = "force-dynamic";
 
@@ -33,9 +34,12 @@ export default async function CycleReportPage({
           </Link>
           <h1 className="mt-1 text-xl font-bold">Cycle report: {report.cycle.name}</h1>
         </div>
-        <a href={`/api/reports/cycle-summary?cycleId=${id}&format=csv`} className="btn-secondary">
-          Export CSV
-        </a>
+        <div className="flex items-center gap-2 no-print">
+          <a href={`/api/reports/cycle-summary?cycleId=${id}&format=csv`} className="btn-secondary">
+            Export CSV
+          </a>
+          <PrintButton />
+        </div>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">

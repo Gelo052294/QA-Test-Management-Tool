@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { testerActivity } from "@/lib/reports";
+import PrintButton from "@/components/PrintButton";
 import EmptyProject from "@/components/EmptyProject";
 import { getCurrentProject } from "@/lib/project";
 import { requireUser } from "@/lib/session";
@@ -24,9 +25,12 @@ export default async function TestersReportPage() {
             Per-tester activity <span className="text-sm font-normal text-muted">· {project.key}</span>
           </h1>
         </div>
-        <a href={`/api/reports/testers?projectId=${project.id}&format=csv`} className="btn-secondary">
-          Export CSV
-        </a>
+        <div className="flex items-center gap-2 no-print">
+          <a href={`/api/reports/testers?projectId=${project.id}&format=csv`} className="btn-secondary">
+            Export CSV
+          </a>
+          <PrintButton />
+        </div>
       </div>
 
       <div className="card overflow-x-auto p-0">
